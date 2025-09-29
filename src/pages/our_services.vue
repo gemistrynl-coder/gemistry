@@ -1,204 +1,438 @@
 <template>
   <div class="page">
     <section id="services">
-      <h2>Our Services</h2>
 
-      <!-- GRID: 4 per row -->
-      <div class="services-grid">
-        <!-- CUSTOM DESIGNS -->
-        <div class="service-card">
-          <img src="@/img/closeup/img1.jpg" alt="Custom Designs" />
-          <h3>CUSTOM DESIGNS</h3>
-          <hr>
-          <p class="price">vanaf €60,-</p>
-          <p class="desc">Maak jou creativiteit,<br />realiteit.</p>
-        </div>
+      <!-- Loop door de categorieën (basic, deal, gold) -->
+      <div
+          v-for="(items, type) in groupedServices"
+          :key="type"
+          class="category-block"
+      >
+        <h3 class="category-title">{{ formatType(type) }}</h3>
+        <div class="category-divider"></div>
 
-        <!-- SHAPES -->
-        <div class="service-card">
-          <img src="@/img/closeup/kaolo.JPG" alt="Shapes" />
-          <h3>SHAPES</h3>
-          <hr>
-          <p class="price">vanaf €40,-</p>
-          <p class="desc">Verschillende vormen en<br />maten, kies jou stijl.</p>
-        </div>
-
-        <!-- SIMPLE -->
-        <div class="service-card">
-          <img src="@/img/closeup/img2.jpg" alt="Simple" />
-          <h3>SIMPLE</h3>
-          <hr>
-          <p class="price">vanaf €30,-</p>
-          <p class="desc">Basic designs</p>
-        </div>
-
-        <!-- DUO DEALS -->
-        <div class="service-card">
-          <img src="@/img/random_image/IMG_4111.JPG" alt="Duo Deals" />
-          <h3>DUO DEALS</h3>
-          <hr>
-          <p class="price">€50,-</p>
-          <p class="desc">
-            Breng een vriend of vriendin en<br />krijg beide een gem met korting.
-          </p>
-        </div>
-
-        <!-- GEMISTRY -->
-        <div class="service-card">
-          <img src="@/img/random_image/IMG_4118.JPG" alt="Gemistry" />
-          <h3>GEMISTRY</h3>
-          <hr>
-          <p class="price">€70,-</p>
-          <p class="desc">
-            Breng een vriend of vriendin en<br />krijg beide twee gems met korting.
-          </p>
-        </div>
-
-        <!-- VIP SETS -->
-        <div class="service-card">
-          <img src="@/img/random_image/IMG_6666.jpg" alt="VIP Sets" />
-          <h3>VIP SETS</h3>
-          <hr>
-          <p class="price">€120,-</p>
-          <p class="desc">
-            Zet een gouden design en<br />krijg er een swarovski gem bij.
-          </p>
-        </div>
-
-        <!-- 18 KARAAT GOUD -->
-        <div class="service-card">
-          <img src="@/img/placeholder.jpg" alt="18 Karaat Goud" />
-          <h3>18 KARAAT GOUD</h3>
-          <hr>
-          <p class="price">€100,-</p>
-          <p class="desc">
-            Exclusieve 18 karaat gouden designs<br />voor een luxe uitstraling.
-          </p>
-        </div>
-
-        <!-- GOLDEN DUO -->
-        <div class="service-card">
-          <img src="@/img/placeholder.jpg" alt="Golden Duo" />
-          <h3>GOLDEN DUO</h3>
-          <hr>
-          <p class="price">€180,-</p>
-          <p class="desc">
-            Een gouden combinatie voor jou<br />en je beste vriend(in).
-          </p>
+        <div class="services-grid">
+          <div
+              class="service-card"
+              v-for="item in items"
+              :key="item.id"
+              @click="openServicePopup(item)"
+          >
+            <div class="card-image">
+              <img :src="resolveImage(item.image_url)" :alt="item.naam" />
+            </div>
+            <div class="card-body">
+              <h3>{{ item.naam }}</h3>
+              <p class="price">€{{ formatPrice(item.prijs) }}</p>
+              <p class="desc">{{ item.tldr }}</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
-    <!-- FOOTER (zelfde als home.vue) -->
+
+    <!-- FOOTER -->
     <footer>
       <div id="footer_legal">
         <p>Privacy policy | Algemene voorwaarden</p>
         <p>© 2025 Gemistry. Alle rechten voorbehouden.</p>
       </div>
     </footer>
+
+    <!-- SERVICE POPUP -->
+    <div
+        v-if="showPopup"
+        class="gem-modal-overlay"
+        @click.self="closeServicePopup"
+    >
+      <div class="service-modal">
+        <!-- Close -->
+        <button class="gem-close" @click="closeServicePopup" aria-label="Sluiten">
+          ×
+        </button>
+
+        <!-- Header -->
+        <div class="gem-header">
+          <h2>{{ selectedService?.naam }}</h2>
+          <div class="gem-divider"></div>
+        </div>
+
+        <!-- Body -->
+        <div class="gem-body">
+          <div class="popup-left">
+            <img
+                :src="resolveImage(selectedService?.image_url)"
+                :alt="selectedService?.naam"
+            />
+          </div>
+          <div class="popup-right">
+            <p class="popup-price">€{{ formatPrice(selectedService?.prijs) }}</p>
+            <p>{{ selectedService?.description }}</p>
+            <p class="popup-tldr">{{ selectedService?.tldr }}</p>
+
+            <!-- ✅ Items -->
+            <div v-if="popupItems.length">
+              <h4>Items</h4>
+              <ul>
+                <li v-for="it in popupItems" :key="it.id">
+                  {{ it.naam }} - €{{ formatPrice(it.prijs) }}
+                </li>
+              </ul>
+            </div>
+
+            <!-- ✅ Nieuwe knop -->
+            <button class="cta-button" @click="openBooking">
+              Maak nu een afspraak
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
-<script setup lang="ts">
-// Geen speciale script nodig hier
+<script setup>
+import { ref, onMounted, computed } from "vue";
+
+const services = ref([]);
+const showPopup = ref(false);
+const selectedService = ref(null);
+const popupItems = ref([]);
+
+// Data ophalen
+onMounted(async () => {
+  try {
+    const res = await fetch("http://localhost:3001/api/prijslijst");
+    services.value = await res.json();
+  } catch (err) {
+    console.error("❌ API error:", err);
+  }
+});
+
+// Items ophalen per categorie_id
+async function fetchItems(categorieId) {
+  try {
+    const res = await fetch(
+        `http://localhost:3001/api/prijslijst-items/${categorieId}`
+    );
+    return await res.json();
+  } catch (err) {
+    console.error("❌ API error:", err);
+    return [];
+  }
+}
+
+// Data groeperen per type
+const groupedServices = computed(() => {
+  return services.value.reduce((groups, item) => {
+    if (!groups[item.type]) groups[item.type] = [];
+    groups[item.type].push(item);
+    return groups;
+  }, {});
+});
+
+// Helpers
+function formatPrice(price) {
+  return price ? parseFloat(price).toFixed(2).replace(".", ",") : "n.v.t.";
+}
+
+function resolveImage(path) {
+  if (!path) return new URL("/src/img/placeholder.jpg", import.meta.url).href;
+  if (path.startsWith("@/")) {
+    return new URL(path.replace("@/", "/src/"), import.meta.url).href;
+  }
+  return path;
+}
+
+function formatType(type) {
+  switch (type) {
+    case "basic":
+      return "Basic Services";
+    case "deal":
+      return "Deals";
+    case "gold":
+      return "Gold Collection";
+    default:
+      return type;
+  }
+}
+
+// Popup
+async function openServicePopup(item) {
+  selectedService.value = item;
+  showPopup.value = true;
+  popupItems.value = await fetchItems(item.id);
+}
+function closeServicePopup() {
+  showPopup.value = false;
+  popupItems.value = [];
+}
 </script>
 
 <style scoped>
 .page {
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
   background-color: #f2efe8;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  border-radius: 0 0 5px 5px;
-  clip-path: inset(0px -20px -20px -20px); /* voorkomt shadow boven */
+  clip-path: inset(0px -20px -20px -20px);
 }
 
-#services {
-  text-align: center;
-  padding: 40px;
-}
-
-#services h2 {
-  font-size: 36px;
-  margin-bottom: 40px;
-  color: #651a1a;
-}
-
-/* GRID: 4 per rij op desktop */
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 40px;
-}
-
-/* Card styling */
-.service-card {
+/* ===== CATEGORIE ===== */
+.category-block {
+  margin-bottom: 60px;
   text-align: center;
 }
 
-.service-card hr {
-  border: none;
-  border-top: 2px solid #651a1a;
-  margin: 10px auto 15px auto;
-  width: 60%;
-}
-
-.service-card img {
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-  border-radius: 6px;
-}
-
-.service-card h3 {
-  margin-top: 15px;
-  font-size: 18px;
+.category-title {
+  font-size: 28px;
   font-weight: bold;
   color: #651a1a;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
 }
 
-.service-card .price {
-  margin: 8px 0;
+.category-divider {
+  width: 80px;
+  height: 3px;
+  background: #651a1a;
+  margin: 10px auto 30px auto;
+  border-radius: 2px;
+}
+
+/* ===== GRID ===== */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: 35px;
+  padding: 0 20px;
+}
+
+.service-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-8px);
+  cursor: pointer;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.card-image img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.service-card h3 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #651a1a;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.price {
   font-size: 16px;
   font-weight: bold;
   color: #651a1a;
 }
 
-.service-card .desc {
-  font-size: 15px;
-  color: #333;
+.desc {
+  font-size: 17px;
+  color: #444;
   line-height: 1.4;
+  min-height: 40px;
 }
 
-/* ✅ Responsive: 2 per rij op tablet, 1 per rij mobiel */
-@media (max-width: 1000px) {
-  .services-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+/* ======= POPUP ======= */
+.gem-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
 }
-@media (max-width: 600px) {
-  .services-grid {
-    grid-template-columns: 1fr;
+
+.service-modal {
+  background: #f2efe8;
+  color: #651a1a;
+  border-radius: 18px;
+  padding: 30px;
+  width: 90%;
+  max-width: 750px;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  animation: fadeInUp 0.25s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
-/* Footer */
-footer {
-  color: white;
+.gem-close {
+  position: absolute;
+  top: 15px;
+  right: 18px;
+  font-size: 26px;
+  background: #fff;
+  border: 2px solid #651a1a;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  line-height: 32px;
   text-align: center;
-  margin-top: 60px;
-  font-size: 14px;
-  border-radius: 0 0 5px 5px;
+  color: #651a1a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.gem-close:hover {
+  background: #651a1a;
+  color: #fff;
 }
 
-/* Footer legal */
+.gem-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+.gem-header h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+.gem-divider {
+  margin: 12px auto 0 auto;
+  height: 2px;
+  width: 60px;
+  background: #651a1a;
+  border-radius: 2px;
+}
+
+.gem-body {
+  display: flex;
+  flex-direction: row;
+  gap: 25px;
+  align-items: flex-start;
+}
+.gem-body img {
+  width: 260px;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+.popup-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.popup-price {
+  font-weight: bold;
+  font-size: 22px;
+  background: #651a1a0d;
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: inline-block;
+}
+.popup-tldr {
+  font-style: italic;
+  color: #555;
+  margin-top: 4px;
+}
+
+.popup-right h4 {
+  margin-top: 15px;
+  font-size: 18px;
+  text-decoration: underline;
+}
+
+.popup-right ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.popup-right li {
+  margin-bottom: 6px;
+}
+
+@media (max-width: 800px) {
+  .gem-body {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .popup-right {
+    text-align: center;
+    padding-right: 0;
+  }
+}
+
+.cta-button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  background: #651a1a;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  align-self: flex-start;
+}
+
+.cta-button:hover {
+  background: #8a2a2a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 800px) {
+  .cta-button {
+    align-self: center;
+    width: 100%;
+    max-width: 280px;
+  }
+}
+
+/* ===== FOOTER ===== */
 #footer_legal {
   background-color: #651A1A;
   color: white;
   text-align: center;
   padding: 20px;
   font-size: 14px;
-  border-radius: 0 0 5px 5px;
 }
 </style>

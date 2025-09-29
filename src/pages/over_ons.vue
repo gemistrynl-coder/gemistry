@@ -36,33 +36,38 @@
         </div>
 
         <!-- Verhaal -->
-        <div class="story">
-          <p>
-            Bij Gemistry draait alles om jouw glimlach. Wij zijn gespecialiseerd in het zetten van
-            Swarovski toothgems en unieke designs die passen bij jouw stijl. Kwaliteit en hygiëne staan bij
-            ons altijd voorop: we werken met professionele materialen en zorgen dat elke behandeling veilig
-            en comfortabel verloopt.
-          </p>
-          <p>
-            Een toothgem is meer dan een accessoire, het is een statement. Of je nu kiest voor een subtiel
-            kristal of een opvallend design, wij zorgen dat jouw smile de aandacht krijgt die hij verdient.
-            Gemistry staat voor creativiteit, fun en persoonlijke aandacht. In onze salon nemen we de tijd
-            voor je, maar je vindt ons ook op evenementen waar we zorgen voor extra sparkle en beleving.
-          </p>
-          <p>
-            Achter Gemistry staan Didi en Dean, twee ondernemers met een passie voor creativiteit en
-            zelfexpressie. Wij geloven dat een glimlach de krachtigste accessoire is die je kunt dragen en
-            we willen mensen helpen die nog mooier en unieker te maken. Onze missie is simpel: iedereen een
-            stukje extra confidence meegeven, op een manier die past bij zijn of haar persoonlijkheid.
-          </p>
-          <p><b>Your smile, your color, your vibe.</b></p>
+        <!-- Verhaal + Afbeeldingen -->
+        <div class="story-container">
+          <div class="story">
+            <p>
+              Bij Gemistry draait alles om jouw glimlach. Wij zijn gespecialiseerd in het zetten van
+              Swarovski toothgems en unieke designs die passen bij jouw stijl. Kwaliteit en hygiëne staan bij
+              ons altijd voorop: we werken met professionele materialen en zorgen dat elke behandeling veilig
+              en comfortabel verloopt.
+            </p>
+            <p>
+              Een toothgem is meer dan een accessoire, het is een statement. Of je nu kiest voor een subtiel
+              kristal of een opvallend design, wij zorgen dat jouw smile de aandacht krijgt die hij verdient.
+              Gemistry staat voor creativiteit, fun en persoonlijke aandacht. In onze salon nemen we de tijd
+              voor je, maar je vindt ons ook op evenementen waar we zorgen voor extra sparkle en beleving.
+            </p>
+            <p>
+              Achter Gemistry staan Didi en Dean, twee ondernemers met een passie voor creativiteit en
+              zelfexpressie. Wij geloven dat een glimlach de krachtigste accessoire is die je kunt dragen en
+              we willen mensen helpen die nog mooier en unieker te maken. Onze missie is simpel: iedereen een
+              stukje extra confidence meegeven, op een manier die past bij zijn of haar persoonlijkheid.
+            </p>
+            <p><b>Your smile, your color, your vibe.</b></p>
+          </div>
+
+          <div class="story-images">
+            <img src="@/img/ons/krant.jpg" alt="Krant" />
+            <img src="@/img/ons/gems.jpg" alt="Gems" />
+          </div>
         </div>
 
-        <!-- Afbeeldingen (placeholders) -->
-        <div class="story-images">
-          <img src="https://via.placeholder.com/600x350.png?text=Placeholder+1" alt="Placeholder 1" />
-          <img src="https://via.placeholder.com/600x350.png?text=Placeholder+2" alt="Placeholder 2" />
-        </div>
+
+
 
         <!-- Producten -->
         <div id="products">
@@ -176,28 +181,30 @@
 }
 
 
-/* Story tekst */
+/* Nieuwe container om tekst + foto's naast elkaar te zetten */
+.story-container {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  padding: 40px;
+}
+
 .story {
-  margin: 40px 0;
+  flex: 2;
   font-size: 18px;
   line-height: 1.8;
   color: #651a1a;
-  padding: 40px;
-}
-.story p {
-  margin-bottom: 20px;
 }
 
-/* Afbeeldingen */
 .story-images {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  margin: 40px 0;
-  padding: 40px;
 }
+
 .story-images img {
-  width: 100%;
+  width: 100%;   /* neemt volledige kolombreedte */
   border-radius: 8px;
   object-fit: cover;
 }

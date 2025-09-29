@@ -309,7 +309,7 @@
 
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch, nextTick } from "vue";
+import { ref, onMounted, onBeforeUnmount, watch } from "vue";
 import '@/popup/bevestigen.vue'
 
 // ==============================
@@ -321,18 +321,42 @@ const openPopup = () => { showPopup.value = true; };
 const closePopup = () => { showPopup.value = false; };
 
 // ==============================
+// POPUP STATES
+// ==============================
+const showAppointmentPopup = ref(false);
+const showGemPopup = ref(false);
+const showCloseupPopup = ref(false);
+const showVoorwaardenPopup = ref(false);
+
+// ==============================
+// Scroll lock helpers
+// ==============================
+function lockScroll() {
+  const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+  document.body.style.overflow = "hidden";
+  if (scrollBarWidth > 0) {
+    document.body.style.paddingRight = scrollBarWidth + "px";
+  }
+}
+function unlockScroll() {
+  document.body.style.overflow = "";
+  document.body.style.paddingRight = "";
+}
+
+// ✅ één centrale watcher voor ALLE popups
+watch([showAppointmentPopup, showGemPopup, showCloseupPopup, showVoorwaardenPopup], (states) => {
+  if (states.some(Boolean)) {
+    lockScroll();
+  } else {
+    unlockScroll();
+  }
+});
+
+// ==============================
 // APPOINTMENT POPUP
 // ==============================
-
-const showAppointmentPopup = ref(false);
-
-const openAppointmentPopup = () => {
-  showAppointmentPopup.value = true;
-};
-
-const closeAppointmentPopup = () => {
-  showAppointmentPopup.value = false;
-};
+const openAppointmentPopup = () => { showAppointmentPopup.value = true; };
+const closeAppointmentPopup = () => { showAppointmentPopup.value = false; };
 
 // ==============================
 // GEM POPUP
@@ -343,7 +367,6 @@ const gemModules = import.meta.glob(
 );
 const gemImages = Object.values(gemModules).map((m: any) => m.default) as string[];
 
-const showGemPopup = ref(false);
 const currentGemIndex = ref(0);
 const selectedGem = ref<string>("");
 
@@ -357,7 +380,6 @@ const openGemPopup = () => {
   }
   showGemPopup.value = true;
 };
-
 const closeGemPopup = () => { showGemPopup.value = false; };
 
 const goToGem = (i: number) => {
@@ -369,7 +391,6 @@ const goToGem = (i: number) => {
   if (next) preload(next);
   if (prev) preload(prev);
 };
-
 const nextGem = () => goToGem(currentGemIndex.value + 1);
 const prevGem = () => goToGem(currentGemIndex.value - 1);
 
@@ -382,17 +403,6 @@ const onGemKey = (e: KeyboardEvent) => {
 };
 onMounted(() => { window.addEventListener("keydown", onGemKey); });
 onBeforeUnmount(() => { window.removeEventListener("keydown", onGemKey); });
-
-// Scroll lock fix
-let originalOverflowGem = "";
-watch(showGemPopup, (open) => {
-  if (open) {
-    originalOverflowGem = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-  } else {
-    document.body.style.overflow = originalOverflowGem;
-  }
-});
 
 // Swipe
 let gemTouchX = 0;
@@ -411,7 +421,6 @@ const closeupModules = import.meta.glob(
 );
 const closeupImages = Object.values(closeupModules).map((m: any) => m.default) as string[];
 
-const showCloseupPopup = ref(false);
 const currentCloseupIndex = ref(0);
 const selectedCloseup = ref<string>("");
 
@@ -425,7 +434,6 @@ const openCloseupPopup = () => {
   }
   showCloseupPopup.value = true;
 };
-
 const closeCloseupPopup = () => { showCloseupPopup.value = false; };
 
 const goToCloseup = (i: number) => {
@@ -437,7 +445,6 @@ const goToCloseup = (i: number) => {
   if (next) preloadCloseup(next);
   if (prev) preloadCloseup(prev);
 };
-
 const nextCloseup = () => goToCloseup(currentCloseupIndex.value + 1);
 const prevCloseup = () => goToCloseup(currentCloseupIndex.value - 1);
 
@@ -451,17 +458,6 @@ const onCloseupKey = (e: KeyboardEvent) => {
 onMounted(() => { window.addEventListener("keydown", onCloseupKey); });
 onBeforeUnmount(() => { window.removeEventListener("keydown", onCloseupKey); });
 
-// Scroll lock fix
-let originalOverflowCloseup = "";
-watch(showCloseupPopup, (open) => {
-  if (open) {
-    originalOverflowCloseup = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-  } else {
-    document.body.style.overflow = originalOverflowCloseup;
-  }
-});
-
 // Swipe
 let closeupTouchX = 0;
 const onCloseupTouchStart = (e: TouchEvent) => (closeupTouchX = e.touches[0].clientX);
@@ -469,13 +465,6 @@ const onCloseupTouchEnd = (e: TouchEvent) => {
   const dx = e.changedTouches[0].clientX - closeupTouchX;
   if (Math.abs(dx) > 50) dx < 0 ? nextCloseup() : prevCloseup();
 };
-
-// ==============================
-// VOORWAARDEN POPUP
-// ==============================
-const showVoorwaardenPopup = ref(false);
-const openVoorwaardenPopup = () => { showVoorwaardenPopup.value = true; };
-const closeVoorwaardenPopup = () => { showVoorwaardenPopup.value = false; };
 
 // ==============================
 // RANDOM IMAGES (3 tegelijk)
@@ -512,24 +501,21 @@ const galleryItems = ref([
     foto: new URL('@/img/gems/IMG_6667.jpg', import.meta.url).href,
     title: "GEMISTRY GEMS",
     naam: "Ines",
-    description:
-        '"Ik wilde al een tijd een toothgem uitproberen. Dankzij Gemistry ben ik uit mijn comfortzone gestapt en heb ik niet alleen voor een simpele silver gekozen, maar ook voor extra kleur."',
+    description: '"Ik wilde al een tijd een toothgem uitproberen. Dankzij Gemistry ben ik uit mijn comfortzone gestapt en heb ik niet alleen voor een simpele silver gekozen, maar ook voor extra kleur."',
     popup: "gem",
   },
   {
     foto: new URL('@/img/closeup/kaolo.jpg', import.meta.url).href,
     title: "CLOSE-UP VIEW",
     naam: "Chelsey",
-    description:
-        '"Ik had een ontwerp uitgekozen en Gemistry hielp me om de juiste maat erbij te vinden. Iedereen zijn tanden zijn anders, en dat maakt het zo fijn: het gaat hen niet alleen om het ontwerp, maar vooral om wat het beste bij jou past."',
+    description: '"Ik had een ontwerp uitgekozen en Gemistry hielp me om de juiste maat erbij te vinden. Iedereen zijn tanden zijn anders, en dat maakt het zo fijn: het gaat hen niet alleen om het ontwerp, maar vooral om wat het beste bij jou past."',
     popup: "closeup",
   },
   {
     foto: new URL('@/img/random_image/IMG_4072.jpg', import.meta.url).href,
     title: "EVENTS",
     naam: "Club Nyx",
-    description:
-        "Bij Club NYX mochten wij bezoekers voorzien van subtiele crystals tot opvallende designs. Voor Club NYX was onze presence meer dan een Service het was een ervaring die bezoekers verraste, blij maakte en zorgde voor extra kijk op social media. Precies de soort beleving die een avond onvergetelijk maakt.",
+    description: "Bij Club NYX mochten wij bezoekers voorzien van subtiele crystals tot opvallende designs. Voor Club NYX was onze presence meer dan een Service het was een ervaring die bezoekers verraste, blij maakte en zorgde voor extra kijk op social media. Precies de soort beleving die een avond onvergetelijk maakt.",
     popup: "events",
   },
 ]);
@@ -593,9 +579,6 @@ const categories = ref([
   },
 ]);
 const selectedCategory = ref(categories.value[0]);
-
-
-
 </script>
 
 
@@ -948,12 +931,15 @@ footer {
 .gem-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.45);
+  background: rgba(0,0,0,.45);   /* donker overlay */
+  backdrop-filter: blur(6px);    /* ✅ blur achtergrond */
+  -webkit-backdrop-filter: blur(6px); /* voor Safari */
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
 }
+
 .gem-modal {
   background: #651A1A;
   border-radius: 10px;
