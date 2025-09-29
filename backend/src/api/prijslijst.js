@@ -23,6 +23,16 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
+(async () => {
+    try {
+        const [rows] = await pool.query("SHOW TABLES");
+        console.log("✅ Verbonden! Beschikbare tabellen:", rows);
+    } catch (err) {
+        console.error("❌ DB Connectie error:", err.message);
+    }
+})();
+
+
 // ✅ Endpoint: alles ophalen
 app.get("/api/prijslijst", async (req, res) => {
     try {
