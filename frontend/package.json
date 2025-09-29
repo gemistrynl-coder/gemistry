@@ -9,8 +9,7 @@
   "scripts": {
     "dev": "concurrently \"vite\" \"nodemon src/api/prijslijst.js\"",
     "build": "vite build",
-    "preview": "vite preview",
-    "start": "node src/api/prijslijst.js"
+    "preview": "vite preview"
   },
   "dependencies": {
     "cors": "^2.8.5",

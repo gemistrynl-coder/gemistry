@@ -6,7 +6,7 @@ const app = express();
 const PORT = process.env.PORT || 3001; // Railway geeft zelf een $PORT mee
 
 app.use(cors({
-    origin: ["https://www.gemistrytoothgems.nl"],  // alleen je frontend domein
+    origin: ["http://localhost:5173", "https://www.gemistrytoothgems.nl"],
     methods: ["GET", "POST"],
     credentials: true
 }));
@@ -31,10 +31,12 @@ app.get("/api/prijslijst", async (req, res) => {
         );
         res.json(rows);
     } catch (err) {
-        console.error("❌ Database error:", err);
-        res.status(500).json({ error: "Database error" });
+        console.error("❌ Database error:", err.message, err.stack);
+        // stuur lege array terug zodat frontend niet crasht
+        res.json([]);
     }
 });
+
 
 // ✅ Endpoint: per categorie/type
 app.get("/api/prijslijst/:type", async (req, res) => {
