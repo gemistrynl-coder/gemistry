@@ -93,6 +93,8 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import API_BASE_URL from "@/config.js";
+
 
 const services = ref([]);
 const showPopup = ref(false);
@@ -102,7 +104,7 @@ const popupItems = ref([]);
 // Data ophalen
 onMounted(async () => {
   try {
-    const res = await fetch("http://localhost:3001/api/prijslijst");
+    const res = await fetch(`${API_BASE_URL}/api/prijslijst`);
     services.value = await res.json();
   } catch (err) {
     console.error("❌ API error:", err);
@@ -113,7 +115,7 @@ onMounted(async () => {
 async function fetchItems(categorieId) {
   try {
     const res = await fetch(
-        `http://localhost:3001/api/prijslijst-items/${categorieId}`
+        `${API_BASE_URL}/api/prijslijst-items/${categorieId}`
     );
     return await res.json();
   } catch (err) {
