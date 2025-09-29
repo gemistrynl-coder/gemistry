@@ -6,7 +6,7 @@ const app = express();
 const PORT = process.env.PORT || 3001; // Railway geeft zelf een $PORT mee
 
 app.use(cors({
-    origin: ["http://localhost:5173", "https://www.gemistrytoothgems.nl"],
+    origin: ["https://www.gemistrytoothgems.nl"],
     methods: ["GET", "POST"],
     credentials: true
 }));

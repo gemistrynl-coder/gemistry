@@ -93,8 +93,9 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import API_BASE_URL from "@/config.js";
 
+// 🚀 Hardcoded API URL naar je Railway backend
+const API_BASE_URL = "https://gemistrybackend-production.up.railway.app";
 
 const services = ref([]);
 const showPopup = ref(false);
@@ -170,6 +171,7 @@ function closeServicePopup() {
   popupItems.value = [];
 }
 </script>
+
 
 <style scoped>
 .page {
