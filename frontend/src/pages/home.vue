@@ -505,7 +505,7 @@ const galleryItems = ref([
     popup: "gem",
   },
   {
-    foto: new URL('@/img/closeup/kaolo.jpg', import.meta.url).href,
+    foto: new URL('@/img/closeup/kaolo.JPG', import.meta.url).href,
     title: "CLOSE-UP VIEW",
     naam: "Chelsey",
     description: '"Ik had een ontwerp uitgekozen en Gemistry hielp me om de juiste maat erbij te vinden. Iedereen zijn tanden zijn anders, en dat maakt het zo fijn: het gaat hen niet alleen om het ontwerp, maar vooral om wat het beste bij jou past."',
