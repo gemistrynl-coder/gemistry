@@ -140,8 +140,11 @@ function formatPrice(price) {
 }
 
 function resolveImage(path) {
-  return path ? path : "/img/placeholder.jpg";
+  if (!path) return "/img/placeholder.jpg";
+  // Strip "@/"" uit database values
+  return path.replace(/^@\//, "/");
 }
+
 
 
 function formatType(type) {
