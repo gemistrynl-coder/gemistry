@@ -23,13 +23,10 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
+// check connectie direct bij start
 (async () => {
-    try {
-        const [rows] = await pool.query("SHOW TABLES");
-        console.log("✅ Verbonden! Beschikbare tabellen:", rows);
-    } catch (err) {
-        console.error("❌ DB Connectie error:", err.message);
-    }
+    const [rows] = await pool.query("SELECT NOW() as tijd");
+    console.log("✅ Verbonden met DB, tijd:", rows[0].tijd);
 })();
 
 
