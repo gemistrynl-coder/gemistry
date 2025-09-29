@@ -5,7 +5,11 @@ import cors from "cors";
 const app = express();
 const PORT = process.env.PORT || 3001; // Railway geeft zelf een $PORT mee
 
-app.use(cors());
+app.use(cors({
+    origin: ["https://www.gemistrytoothgems.nl"],  // alleen je frontend domein
+    methods: ["GET", "POST"],
+    credentials: true
+}));
 
 // DB connectie via Railway env vars
 const pool = mysql.createPool({
