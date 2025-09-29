@@ -3,17 +3,20 @@ import mysql from "mysql2/promise";
 import cors from "cors";
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001; // Railway geeft zelf een $PORT mee
 
 app.use(cors());
 
-// DB connectie
+// DB connectie via Railway env vars
 const pool = mysql.createPool({
-    host: "centerbeam.proxy.rlwy.net",
-    port: 21767,
-    user: "root",
-    password: "XfruCWfQIGIIqazeuNyvwiNcTeTaddPW",
-    database: "railway"
+    host: process.env.MYSQLHOST,
+    port: process.env.MYSQLPORT,
+    user: process.env.MYSQLUSER,
+    password: process.env.MYSQLPASSWORD,
+    database: process.env.MYSQLDATABASE,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
 // ✅ Endpoint: alles ophalen
@@ -73,5 +76,5 @@ app.get("/api/prijslijst-items/:categorieId", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`✅ API running at http://localhost:${PORT}`);
+    console.log(`✅ API running on port ${PORT}`);
 });
