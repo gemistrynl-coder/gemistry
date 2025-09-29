@@ -140,12 +140,9 @@ function formatPrice(price) {
 }
 
 function resolveImage(path) {
-  if (!path) return new URL("/src/img/placeholder.jpg", import.meta.url).href;
-  if (path.startsWith("@/")) {
-    return new URL(path.replace("@/", "/src/"), import.meta.url).href;
-  }
-  return path;
+  return path ? path : "/img/placeholder.jpg";
 }
+
 
 function formatType(type) {
   switch (type) {
