@@ -65,6 +65,8 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
+  position: relative;
+  z-index: 100; /* lager dan popup */
 }
 
 header h3 {
@@ -90,6 +92,8 @@ header h3 {
   flex-direction: column;
   background: #651a1a;
   padding: 10px 0;
+  position: relative;
+  z-index: 100; /* lager dan popup */
 }
 
 .mobile-nav a {
