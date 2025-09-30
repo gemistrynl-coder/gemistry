@@ -8,8 +8,8 @@ export default defineConfig({
     plugins: [vue(), vueDevTools()],
     resolve: {
         alias: {
-            '@desktop': fileURLToPath(new URL('./desktop', import.meta.url)),
-            '@mobile': fileURLToPath(new URL('./mobile', import.meta.url)),
+            '@desktop': fileURLToPath(new URL('./src/desktop', import.meta.url)),
+            '@mobile': fileURLToPath(new URL('./src/mobile', import.meta.url)),
             '@': fileURLToPath(new URL('./src', import.meta.url)), // globaal
         },
     },
