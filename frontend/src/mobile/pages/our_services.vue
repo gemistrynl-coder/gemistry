@@ -294,8 +294,8 @@ function closeServicePopup() {
   color: #651a1a;
   border-radius: 18px;
   padding: 30px;
-  width: 90%;
-  height: 80%;
+  width: 100%;
+  height: 100%;
   max-width: 750px;
   max-height: 80vh;
   overflow-y: auto;
