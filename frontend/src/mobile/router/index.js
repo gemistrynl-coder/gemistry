@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import Home from '@/mobile/pages/home.vue'
-import ContactUs from '@/mobile/pages/contact_us.vue'
 import OurServices from '@/mobile/pages/our_services.vue'
 import OverOns from '@/mobile/pages/over_ons.vue'
 
