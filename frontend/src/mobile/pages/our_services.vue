@@ -47,12 +47,12 @@
     >
       <div class="service-modal">
         <!-- Close -->
-        <button class="gem-close" @click="closeServicePopup" aria-label="Sluiten">
-          ×
-        </button>
 
         <!-- Header -->
         <div class="gem-header">
+          <button class="gem-close" @click="closeServicePopup" aria-label="Sluiten">
+            ×
+          </button>
           <h2>{{ selectedService?.naam }}</h2>
           <div class="gem-divider"></div>
         </div>
@@ -292,7 +292,7 @@ function closeServicePopup() {
   background: #f2efe8;
   color: #651a1a;
   border-radius: 18px;
-  padding: 30px;
+  padding: 100px 30px 30px 30px;
   width: 90%;
   height: 80%;
   max-width: 750px;
@@ -315,6 +315,7 @@ function closeServicePopup() {
 }
 
 .gem-close {
+  margin-top: 70px;
   position: absolute;
   top: 15px;
   right: 18px;
