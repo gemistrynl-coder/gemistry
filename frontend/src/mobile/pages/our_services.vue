@@ -89,6 +89,7 @@ const showPopup = ref(false)
 const selectedService = ref(null)
 const popupItems = ref([])
 
+
 // Data ophalen
 onMounted(async () => {
   try {
@@ -141,15 +142,30 @@ function formatType(type) {
 }
 
 // Popup
+// Popup openen
 async function openServicePopup(item) {
-  selectedService.value = item
-  showPopup.value = true
-  popupItems.value = await fetchItems(item.id)
+  selectedService.value = item;
+  showPopup.value = true;
+
+  // lock body scroll
+  document.body.style.overflow = "hidden";
+
+  // Neppe items voor test
+  popupItems.value = [
+    { id: 101, categorie_id: 1, naam: "Extra glitter", prijs: 9.99 },
+    { id: 102, categorie_id: 1, naam: "Deluxe afwerking", prijs: 19.99 }
+  ];
 }
+
+// Popup sluiten
 function closeServicePopup() {
-  showPopup.value = false
-  popupItems.value = []
+  showPopup.value = false;
+  popupItems.value = [];
+
+  // restore body scroll
+  document.body.style.overflow = "";
 }
+
 
 // Dummy booking
 function openBooking() {
@@ -342,6 +358,8 @@ function openBooking() {
   color: #555;
   margin-top: 4px;
 }
+
+.cta-button { margin-top: 20px; padding: 12px 24px; font-size: 18px; font-weight: bold; color: #fff; background: #651a1a; border: none; border-radius: 10px; cursor: pointer; transition: all 0.25s ease; align-self: flex-start; }
 
 @media (max-width: 800px) {
   .gem-body {
