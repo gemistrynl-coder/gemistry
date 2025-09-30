@@ -41,10 +41,6 @@ const pool = mysql.createPool({
 // GOOGLE DRIVE SETUP
 // ===============================
 
-if (!process.env.GOOGLE_KEY_JSON) {
-    console.error("❌ GOOGLE_KEY_JSON ontbreekt! Voeg de service account JSON toe in Railway → Variables.");
-    process.exit(1);
-}
 
 const credentials = {
     client_email: process.env.GOOGLE_CLIENT_EMAIL,
