@@ -289,7 +289,7 @@ function closeServicePopup() {
 }
 
 .service-modal {
-  margin-top: 50px;
+  margin-top: 100px;
   background: #f2efe8;
   color: #651a1a;
   border-radius: 18px;
