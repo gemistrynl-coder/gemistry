@@ -102,6 +102,8 @@ const showPopup = ref(false);
 const selectedService = ref(null);
 const popupItems = ref([]);
 
+services.value = ["hha"]
+
 // Data ophalen
 onMounted(async () => {
   try {
@@ -292,6 +294,7 @@ function closeServicePopup() {
   border-radius: 18px;
   padding: 30px;
   width: 90%;
+  height: 80%;
   max-width: 750px;
   max-height: 85vh;
   overflow-y: auto;
