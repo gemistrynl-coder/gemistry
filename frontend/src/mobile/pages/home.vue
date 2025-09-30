@@ -96,10 +96,10 @@
           <h3>Already following up?</h3>
           <div id="social_media_icons">
             <a href="https://www.instagram.com/gemistry.ams/" target="_blank">
-              <img src="../img/icons/insta_icon.png" alt="Instagram" />
+              <img src="../assets/img/icons/insta_icon.png" alt="Instagram" />
             </a>
             <a href="https://www.tiktok.com/@gemistry" target="_blank">
-              <img src="../img/icons/tiktok_icon.png" alt="TikTok" />
+              <img src="../assets/img/icons/tiktok_icon.png" alt="TikTok" />
             </a>
             <a href="" id="contact">contact</a>
           </div>
@@ -201,7 +201,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch } from "vue";
-import '@/popup/bevestigen.vue'
 
 // ==============================
 // BLOGPOSTS DYNAMISCH LADEN
@@ -268,7 +267,7 @@ const closeAppointmentPopup = () => { showAppointmentPopup.value = false; };
 // GEM POPUP
 // ==============================
 const gemModules = import.meta.glob(
-    "/src/img/gems/*.{png,jpg,jpeg,gif,webp,JPG}",
+    "@/mobile/assets/img/gems/*.{png,jpg,jpeg,gif,webp,JPG}",
     { eager: true }
 );
 const gemImages = Object.values(gemModules).map((m: any) => m.default) as string[];
@@ -304,7 +303,7 @@ const prevGem = () => goToGem(currentGemIndex.value - 1);
 // CLOSEUP POPUP
 // ==============================
 const closeupModules = import.meta.glob(
-    "/src/img/closeup/*.{png,jpg,jpeg,gif,webp,JPG}",
+    "@/mobile/assets/img/closeup/*.{png,jpg,jpeg,gif,webp,JPG}",
     { eager: true }
 );
 const closeupImages = Object.values(closeupModules).map((m: any) => m.default) as string[];
@@ -340,7 +339,7 @@ const prevCloseup = () => goToCloseup(currentCloseupIndex.value - 1);
 // RANDOM IMAGES (3 tegelijk)
 // ==============================
 const modules = import.meta.glob(
-    "/src/img/random_image/*.{png,jpg,jpeg,gif,webp,JPG}",
+    "@/desktop/assets/img/random_image/*.{png,jpg,jpeg,gif,webp,JPG}",
     { eager: true }
 );
 const images = Object.values(modules).map((m: any) => m.default);
@@ -368,21 +367,21 @@ onBeforeUnmount(() => { if (intervalId) clearInterval(intervalId); });
 // ==============================
 const galleryItems = ref([
   {
-    foto: new URL('@mobile/img/gems/IMG_6667.jpg', import.meta.url).href,
+    foto: new URL('@mobile/assets/img/gems/IMG_6667.jpg', import.meta.url).href,
     title: "GEMISTRY GEMS",
     naam: "Ines",
     description: '"Ik wilde al een tijd een toothgem uitproberen..."',
     popup: "gem",
   },
   {
-    foto: new URL('@mobile/img/closeup/kaolo.JPG', import.meta.url).href,
+    foto: new URL('@mobile/assets/img/closeup/kaolo.JPG', import.meta.url).href,
     title: "CLOSE-UP VIEW",
     naam: "Chelsey",
     description: '"Ik had een ontwerp uitgekozen..."',
     popup: "closeup",
   },
   {
-    foto: new URL('@mobile/img/random_image/IMG_4072.jpg', import.meta.url).href,
+    foto: new URL('@mobile/assets/img/random_image/IMG_4072.jpg', import.meta.url).href,
     title: "EVENTS",
     naam: "Club Nyx",
     description: "Bij Club NYX mochten wij bezoekers voorzien...",
@@ -414,7 +413,7 @@ const handleCardClick = (item: GalleryItem) => {
 
 @font-face {
   font-family: 'Vogue';
-  src: url('@/font/Vogue.ttf');
+  src: url('@/mobile/assets/font/Vogue.ttf');
 
 }
 
@@ -443,7 +442,7 @@ const handleCardClick = (item: GalleryItem) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url("../img/main/image1.jpeg");
+  background-image: url("../assets/img/main/image1.jpeg");
   background-position: center center;
   background-size: cover;
   position: relative;

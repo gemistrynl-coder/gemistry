@@ -339,7 +339,7 @@ const prevCloseup = () => goToCloseup(currentCloseupIndex.value - 1);
 // RANDOM IMAGES (3 tegelijk)
 // ==============================
 const modules = import.meta.glob(
-    "../assets/img/random_image/*.{png,jpg,jpeg,gif,webp,JPG}",
+    "@/desktop/assets/img/random_image/*.{png,jpg,jpeg,gif,webp,JPG}",
     { eager: true }
 );
 const images = Object.values(modules).map((m: any) => m.default);
@@ -413,7 +413,7 @@ const handleCardClick = (item: GalleryItem) => {
 
 @font-face {
   font-family: 'Vogue';
-  src: url('@/font/Vogue.ttf');
+  src: url('@/desktop/assets/font/Vogue.ttf');
 
 }
 

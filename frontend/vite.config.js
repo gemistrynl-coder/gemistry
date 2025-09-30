@@ -10,10 +10,10 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            '@desktop': fileURLToPath(new URL('./desktop/src', import.meta.url)),
-            '@mobile': fileURLToPath(new URL('./mobile/src', import.meta.url)),
-            // eventueel een globale @ naar frontend/src als je dat later wilt gebruiken
-            '@': fileURLToPath(new URL('./src', import.meta.url)),
+            '@desktop': fileURLToPath(new URL('./desktop/assets', import.meta.url)),
+            '@mobile': fileURLToPath(new URL('./mobile/assets', import.meta.url)),
+            // eventueel een globale @ naar frontend/assets als je dat later wilt gebruiken
+            '@': fileURLToPath(new URL('./assets', import.meta.url)),
         },
     },
 })
