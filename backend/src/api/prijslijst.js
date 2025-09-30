@@ -9,9 +9,8 @@ import fs from "fs";
 // CONFIG
 // ===============================
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3001; // Railway geeft zelf een $PORT mee
 
-// CORS instellen
 app.use(cors({
     origin: ["https://www.gemistrytoothgems.nl"],
     methods: ["GET", "POST"],
@@ -32,7 +31,7 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-// Check connectie bij start
+// check connectie direct bij start
 (async () => {
     const [rows] = await pool.query("SELECT NOW() as tijd");
     console.log("✅ Verbonden met DB, tijd:", rows[0].tijd);
@@ -41,26 +40,33 @@ const pool = mysql.createPool({
 // ===============================
 // GOOGLE DRIVE SETUP
 // ===============================
+
+// Probeer env var GOOGLE_KEY_JSON (Railway) → anders lokaal JSON bestand
+let credentials;
+if (process.env.GOOGLE_KEY_JSON) {
+    credentials = JSON.parse(process.env.GOOGLE_KEY_JSON);
+} else {
+    credentials = JSON.parse(fs.readFileSync("public/blog-473623-7fd7db1d0012.json"));
+}
+
 const auth = new google.auth.GoogleAuth({
-    keyFile: "public/blog-473623-7fd7db1d0012.json", // je service account key
+    credentials,
     scopes: ["https://www.googleapis.com/auth/drive.readonly"],
 });
 const drive = google.drive({ version: "v3", auth });
 
-// De folder ID van jouw `blogpost` map
-// (rechtsklik op de map in Drive → "Link ophalen" → ID kopiëren)
+// ID van jouw `blogpost` map (rechtsklik → "Link ophalen")
 const BLOGPOST_FOLDER_ID = "1Vo8uUqYxxSoUPrZrNKG77rcdOc67IVhd";
 
-// Helper: bestand-inhoud uitlezen
+// Helpers
 async function readFileContent(fileId) {
-    const res = await drive.files.get({
-        fileId,
-        alt: "media"
-    }, { responseType: "text" });
+    const res = await drive.files.get(
+        { fileId, alt: "media" },
+        { responseType: "text" }
+    );
     return res.data;
 }
 
-// Helper: lijst bestanden in een map
 async function listFilesInFolder(folderId) {
     const res = await drive.files.list({
         q: `'${folderId}' in parents and trashed = false`,
@@ -73,7 +79,7 @@ async function listFilesInFolder(folderId) {
 // ENDPOINTS
 // ===============================
 
-// ✅ Prijslijst
+// ✅ Alle categorieën
 app.get("/api/prijslijst", async (req, res) => {
     try {
         const [rows] = await pool.query(
@@ -81,12 +87,55 @@ app.get("/api/prijslijst", async (req, res) => {
         );
         res.json(rows);
     } catch (err) {
-        console.error("❌ Database error:", err.message);
+        console.error("❌ Database error:", err.message, err.stack);
         res.json([]);
     }
 });
 
-// ✅ Blogposts vanuit Google Drive
+// ✅ Per categorie type
+app.get("/api/prijslijst/:type", async (req, res) => {
+    try {
+        const type = req.params.type;
+        const [rows] = await pool.query(
+            "SELECT id, naam, description, tldr, prijs, type, image_url FROM prijslijst_categorie WHERE type = ? ORDER BY id",
+            [type]
+        );
+        res.json(rows);
+    } catch (err) {
+        console.error("❌ Database error:", err);
+        res.status(500).json({ error: "Database error" });
+    }
+});
+
+// ✅ Alle items
+app.get("/api/prijslijst-items", async (req, res) => {
+    try {
+        const [rows] = await pool.query(
+            "SELECT id, categorie_id, naam, prijs FROM prijslijst_items ORDER BY categorie_id, id"
+        );
+        res.json(rows);
+    } catch (err) {
+        console.error("❌ Database error:", err);
+        res.status(500).json({ error: "Database error" });
+    }
+});
+
+// ✅ Items per categorie
+app.get("/api/prijslijst-items/:categorieId", async (req, res) => {
+    try {
+        const categorieId = req.params.categorieId;
+        const [rows] = await pool.query(
+            "SELECT id, categorie_id, naam, prijs FROM prijslijst_items WHERE categorie_id = ? ORDER BY id",
+            [categorieId]
+        );
+        res.json(rows);
+    } catch (err) {
+        console.error("❌ Database error:", err);
+        res.status(500).json({ error: "Database error" });
+    }
+});
+
+// ✅ Blogposts ophalen vanuit Google Drive
 app.get("/api/blogposts", async (req, res) => {
     try {
         const blogFolders = await listFilesInFolder(BLOGPOST_FOLDER_ID);
@@ -98,7 +147,7 @@ app.get("/api/blogposts", async (req, res) => {
             const files = await listFilesInFolder(folder.id);
 
             const jsonFile = files.find(f => f.name.endsWith(".json"));
-            const imgFile = files.find(f => f.mimeType.startsWith("image/"));
+            const imgFile = files.find(f => f.mimeType && f.mimeType.startsWith("image/"));
 
             if (!jsonFile) continue;
 
@@ -107,9 +156,7 @@ app.get("/api/blogposts", async (req, res) => {
 
             posts.push({
                 ...jsonData,
-                imageUrl: imgFile
-                    ? `https://drive.google.com/uc?id=${imgFile.id}`
-                    : null
+                imageUrl: imgFile ? `https://drive.google.com/uc?id=${imgFile.id}` : null
             });
         }
 
