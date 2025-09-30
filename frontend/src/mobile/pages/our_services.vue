@@ -302,6 +302,7 @@ function closeServicePopup() {
   position: relative;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
   animation: fadeInUp 0.25s ease;
+  z-index: 9999;
 }
 
 @keyframes fadeInUp {
