@@ -15,8 +15,6 @@
       <router-link to="/services" @click="closeMenu">Services</router-link>
     </nav>
 
-
-
     <!-- Hier wisselt de content -->
     <router-view />
   </div>
@@ -50,13 +48,6 @@ function closeMenu() {
   background: #f2efe8;
 }
 
-hr {
-  border: 1px solid #651a1a;
-  outline: 1px solid #f2efe8;
-  margin: 1px;
-  padding: 0;
-}
-
 /* ===== HEADER ===== */
 header {
   background: #651a1a;
@@ -66,7 +57,7 @@ header {
   align-items: center;
   padding: 12px 16px;
   position: relative;
-  z-index: 100; /* lager dan popup */
+  z-index: 10; /* popup zit er sowieso boven */
 }
 
 header h3 {
@@ -93,7 +84,7 @@ header h3 {
   background: #651a1a;
   padding: 10px 0;
   position: relative;
-  z-index: 100; /* lager dan popup */
+  z-index: 10;
 }
 
 .mobile-nav a {

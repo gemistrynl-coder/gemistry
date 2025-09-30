@@ -39,20 +39,12 @@
       </div>
     </footer>
 
-    <!-- SERVICE POPUP -->
-    <div
-        v-if="showPopup"
-        class="gem-modal-overlay"
-        @click.self="closeServicePopup"
-    >
+    <!-- SERVICE POPUP (volledig scherm) -->
+    <div v-if="showPopup" class="gem-modal-overlay">
       <div class="service-modal">
-        <!-- Close -->
-
         <!-- Header -->
         <div class="gem-header">
-          <button class="gem-close" @click="closeServicePopup" aria-label="Sluiten">
-            ×
-          </button>
+          <button class="gem-close" @click="closeServicePopup" aria-label="Sluiten">×</button>
           <h2>{{ selectedService?.naam }}</h2>
           <div class="gem-divider"></div>
         </div>
@@ -60,17 +52,13 @@
         <!-- Body -->
         <div class="gem-body">
           <div class="popup-left">
-            <img
-                :src="resolveImage(selectedService?.image_url)"
-                :alt="selectedService?.naam"
-            />
+            <img :src="resolveImage(selectedService?.image_url)" :alt="selectedService?.naam" />
           </div>
           <div class="popup-right">
             <p class="popup-price">€{{ formatPrice(selectedService?.prijs) }}</p>
             <p>{{ selectedService?.description }}</p>
             <p class="popup-tldr">{{ selectedService?.tldr }}</p>
 
-            <!-- ✅ Items -->
             <div v-if="popupItems.length">
               <h4>Items</h4>
               <ul>
@@ -80,7 +68,6 @@
               </ul>
             </div>
 
-            <!-- ✅ Nieuwe knop -->
             <button class="cta-button" @click="openBooking">
               Maak nu een afspraak
             </button>
@@ -92,106 +79,89 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed } from "vue"
 
-// 🚀 Hardcoded API URL naar je Railway backend
-const API_BASE_URL = "https://gemistrybackend-production.up.railway.app";
+// 🚀 Railway backend URL
+const API_BASE_URL = "https://gemistrybackend-production.up.railway.app"
 
-const services = ref([]);
-const showPopup = ref(false);
-const selectedService = ref(null);
-const popupItems = ref([]);
-
-services.value = ["hha"]
+const services = ref([])
+const showPopup = ref(false)
+const selectedService = ref(null)
+const popupItems = ref([])
 
 // Data ophalen
 onMounted(async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/prijslijst`);
-    services.value = await res.json();
+    const res = await fetch(`${API_BASE_URL}/api/prijslijst`)
+    services.value = await res.json()
   } catch (err) {
-    console.error("❌ API error:", err);
+    console.error("❌ API error:", err)
   }
-});
+})
 
 // Items ophalen per categorie_id
 async function fetchItems(categorieId) {
   try {
-    const res = await fetch(
-        `${API_BASE_URL}/api/prijslijst-items/${categorieId}`
-    );
-    return await res.json();
+    const res = await fetch(`${API_BASE_URL}/api/prijslijst-items/${categorieId}`)
+    return await res.json()
   } catch (err) {
-    console.error("❌ API error:", err);
-    return [];
+    console.error("❌ API error:", err)
+    return []
   }
 }
 
 // Data groeperen per type
 const groupedServices = computed(() => {
   return services.value.reduce((groups, item) => {
-    if (!groups[item.type]) groups[item.type] = [];
-    groups[item.type].push(item);
-    return groups;
-  }, {});
-});
+    if (!groups[item.type]) groups[item.type] = []
+    groups[item.type].push(item)
+    return groups
+  }, {})
+})
 
 // Helpers
 function formatPrice(price) {
-  return price ? parseFloat(price).toFixed(2).replace(".", ",") : "n.v.t.";
+  return price ? parseFloat(price).toFixed(2).replace(".", ",") : "n.v.t."
 }
 
 function resolveImage(path) {
-  // Als er niks in de DB staat → toon placeholder
-  if (!path) return "/img/placeholder.jpg";
-
-  // Strip "@/..."
-  const cleanPath = path.replace(/^@\//, "/");
-
-  // 🚨 Check of het pad naar public/img wijst
-  if (!cleanPath.startsWith("/img/")) {
-    return "/img/placeholder.jpg";
-  }
-
-  return cleanPath;
+  if (!path) return "/img/placeholder.jpg"
+  const cleanPath = path.replace(/^@\//, "/")
+  if (!cleanPath.startsWith("/img/")) return "/img/placeholder.jpg"
+  return cleanPath
 }
-
-
-
-
 
 function formatType(type) {
   switch (type) {
-    case "basic":
-      return "Basic Services";
-    case "deal":
-      return "Deals";
-    case "gold":
-      return "Gold Collection";
-    default:
-      return type;
+    case "basic": return "Basic Services"
+    case "deal": return "Deals"
+    case "gold": return "Gold Collection"
+    default: return type
   }
 }
 
 // Popup
 async function openServicePopup(item) {
-  selectedService.value = item;
-  showPopup.value = true;
-  popupItems.value = await fetchItems(item.id);
+  selectedService.value = item
+  showPopup.value = true
+  popupItems.value = await fetchItems(item.id)
 }
 function closeServicePopup() {
-  showPopup.value = false;
-  popupItems.value = [];
+  showPopup.value = false
+  popupItems.value = []
+}
+
+// Dummy booking
+function openBooking() {
+  alert("Boekingsfunctie hier 🚀")
 }
 </script>
-
 
 <style scoped>
 .page {
   width: 100%;
   min-height: 100vh;
   background-color: #f2efe8;
-  clip-path: inset(0px -20px -20px -20px);
 }
 
 /* ===== CATEGORIE ===== */
@@ -235,7 +205,6 @@ function closeServicePopup() {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-
 .service-card:hover {
   transform: translateY(-8px);
   cursor: pointer;
@@ -280,40 +249,24 @@ function closeServicePopup() {
 .gem-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: #f2efe8; /* geen blur, gewoon achtergrond */
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   z-index: 9999;
-  backdrop-filter: blur(4px);
+  overflow-y: auto;
 }
 
 .service-modal {
-  margin-top: 100px;
-  background: #f2efe8;
-  color: #651a1a;
-  border-radius: 18px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   padding: 30px;
+  color: #651a1a;
   width: 100%;
   height: 100%;
-  max-width: 750px;
-  max-height: 80vh;
+  box-sizing: border-box;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-  animation: fadeInUp 0.25s ease;
-  z-index: 9999;
-}
-
-@keyframes fadeInUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
 }
 
 .gem-close {
@@ -340,12 +293,12 @@ function closeServicePopup() {
 .gem-header {
   text-align: center;
   margin-bottom: 25px;
+  position: relative;
 }
 .gem-header h2 {
   margin: 0;
   font-size: 28px;
   font-weight: bold;
-  letter-spacing: 0.5px;
 }
 .gem-divider {
   margin: 12px auto 0 auto;
@@ -360,10 +313,10 @@ function closeServicePopup() {
   flex-direction: row;
   gap: 25px;
   align-items: flex-start;
+  margin-top: 20px;
 }
 .gem-body img {
   width: 260px;
-  height: auto;
   border-radius: 12px;
   object-fit: cover;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
@@ -374,8 +327,6 @@ function closeServicePopup() {
   flex-direction: column;
   gap: 12px;
   text-align: left;
-  overflow-y: auto;
-  padding-right: 6px;
 }
 
 .popup-price {
@@ -392,67 +343,11 @@ function closeServicePopup() {
   margin-top: 4px;
 }
 
-.popup-right h4 {
-  margin-top: 15px;
-  font-size: 18px;
-  text-decoration: underline;
-}
-
-.popup-right ul {
-  margin: 0;
-  padding-left: 18px;
-}
-
-.popup-right li {
-  margin-bottom: 6px;
-}
-
 @media (max-width: 800px) {
   .gem-body {
     flex-direction: column;
     align-items: center;
     text-align: center;
   }
-  .popup-right {
-    text-align: center;
-    padding-right: 0;
-  }
-}
-
-.cta-button {
-  margin-top: 20px;
-  padding: 12px 24px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #fff;
-  background: #651a1a;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  align-self: flex-start;
-}
-
-.cta-button:hover {
-  background: #8a2a2a;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-@media (max-width: 800px) {
-  .cta-button {
-    align-self: center;
-    width: 100%;
-    max-width: 280px;
-  }
-}
-
-/* ===== FOOTER ===== */
-#footer_legal {
-  background-color: #651A1A;
-  color: white;
-  text-align: center;
-  padding: 20px;
-  font-size: 14px;
 }
 </style>
