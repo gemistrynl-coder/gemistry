@@ -11,24 +11,41 @@ const app = express();
 const PORT = process.env.PORT || 3001; // Railway geeft zelf een $PORT mee
 
 app.use(cors({
-    origin: ["https://www.gemistrytoothgems.nl"],
+    origin: ["https://www.gemistrytoothgems.nl", "http://192.168.178.50:3001"],
     methods: ["GET", "POST"],
     credentials: true
 }));
 
 // ===============================
-// DB CONNECTIE (Railway env vars)
+// DB CONNECTIE (Railway of lokaal)
 // ===============================
-const pool = mysql.createPool({
-    host: process.env.MYSQLHOST,
-    port: process.env.MYSQLPORT,
-    user: process.env.MYSQLUSER,
-    password: process.env.MYSQLPASSWORD,
-    database: process.env.MYSQL_DATABASE,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-});
+let pool;
+
+if (process.env.RAILWAY_ENVIRONMENT) {
+    // 🚀 Railway
+    pool = mysql.createPool({
+        host: process.env.MYSQLHOST,
+        port: process.env.MYSQLPORT,
+        user: process.env.MYSQLUSER,
+        password: process.env.MYSQLPASSWORD,
+        database: process.env.MYSQL_DATABASE,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0
+    });
+} else {
+    // 💻 Lokaal → gebruik jouw connection string (uit Railway dashboard)
+    pool = mysql.createPool({
+        host: "centerbeam.proxy.rlwy.net",
+        port: 21767,
+        user: "root",
+        password: "XfruCWfQIGIIqazeuNyvwiNcTeTaddPW",
+        database: "railway",
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0
+    });
+}
 
 // check connectie direct bij start
 (async () => {
@@ -82,6 +99,13 @@ async function listFilesInFolder(folderId) {
 // ===============================
 // ENDPOINTS
 // ===============================
+
+// Logging middleware
+app.use((req, res, next) => {
+    console.log(`➡️ ${req.method} ${req.url}`);
+    next();
+});
+
 
 // ✅ Alle categorieën
 app.get("/api/prijslijst", async (req, res) => {

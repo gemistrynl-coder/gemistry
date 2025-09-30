@@ -30,11 +30,6 @@
         </div>
       </div>
     </section>
-    <!-- DEBUG: toon API data -->
-    <pre style="text-align:left; font-size:12px; background:#eee; padding:10px; overflow-x:auto;">
-      {{ services }}
-    </pre>
-
 
     <!-- FOOTER -->
     <footer>
