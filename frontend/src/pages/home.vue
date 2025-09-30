@@ -78,7 +78,7 @@
 
 
 
-        
+
         <br>
       </div>
       <br><br>
@@ -211,7 +211,7 @@ const blogPosts = ref<any[]>([]);
 onMounted(async () => {
   try {
     // 👉 Backend moet JSON + image teruggeven uit je blog-shoot folders
-    const res = await fetch("https://jouw-backend-url/api/blogposts");
+    const res = await fetch(`${API_BASE_URL}/api/blogposts`);
     blogPosts.value = await res.json();
   } catch (err) {
     console.error("❌ Blogposts ophalen mislukt:", err);
