@@ -43,11 +43,13 @@
     <div v-if="showPopup" class="gem-modal-overlay">
       <div class="service-modal">
         <!-- Header -->
+        <!-- Header -->
         <div class="gem-header">
-          <button class="gem-close" @click="closeServicePopup" aria-label="Sluiten">×</button>
           <h2>{{ selectedService?.naam }}</h2>
-          <div class="gem-divider"></div>
+          <button class="gem-close" @click="closeServicePopup" aria-label="Sluiten">×</button>
         </div>
+        <div class="gem-divider"></div>
+
 
         <!-- Body -->
         <div class="gem-body">
@@ -88,6 +90,18 @@ const services = ref([])
 const showPopup = ref(false)
 const selectedService = ref(null)
 const popupItems = ref([])
+
+// services.value = [
+//   {
+//     id: 1,
+//     naam: "Nep Service",
+//     prijs: 49.99,
+//     tldr: "Dit is een korte beschrijving van een nep service.",
+//     description: "Hier staat een uitgebreide uitleg over de nep service die je normaal in de database hebt staan.",
+//     type: "basic",
+//     image_url: "/img/placeholder.jpg"
+//   }
+// ]
 
 
 // Data ophalen
@@ -205,11 +219,11 @@ function openBooking() {
 /* ===== GRID ===== */
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
-  max-width: 1400px;
+  grid-template-columns: repeat(auto-fill, minmax(auto, 1fr));
   margin: 0 auto;
   gap: 35px;
   padding: 0 20px;
+  justify-items: center;
 }
 
 .service-card {
@@ -220,12 +234,9 @@ function openBooking() {
   overflow: hidden;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  width: 90%;
 }
-.service-card:hover {
-  transform: translateY(-8px);
-  cursor: pointer;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
-}
+
 
 .card-image img {
   width: 100%;
@@ -285,18 +296,11 @@ function openBooking() {
   position: relative;
 }
 
+
 .gem-close {
-  position: absolute;
-  top: 15px;
-  right: 18px;
   font-size: 26px;
-  background: #fff;
-  border: 2px solid #651a1a;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  line-height: 32px;
-  text-align: center;
+  background: none;
+  border: none;
   color: #651a1a;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -307,14 +311,18 @@ function openBooking() {
 }
 
 .gem-header {
-  text-align: center;
-  margin-bottom: 25px;
-  position: relative;
+  display: flex;
+  justify-content: space-between; /* titel links, kruisje rechts */
+  align-items: center;
+  margin-bottom: 15px;
 }
+
 .gem-header h2 {
   margin: 0;
   font-size: 28px;
   font-weight: bold;
+  letter-spacing: 0.5px;
+  color: #651a1a;
 }
 .gem-divider {
   margin: 12px auto 0 auto;
