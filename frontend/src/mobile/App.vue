@@ -13,8 +13,6 @@
       <router-link to="/" @click="closeMenu">Home</router-link>
       <router-link to="/over_ons" @click="closeMenu">Over ons</router-link>
       <router-link to="/services" @click="closeMenu">Services</router-link>
-      <router-link to="/contact" @click="closeMenu">Contact</router-link>
-      <router-link to="/prijslijst" @click="closeMenu">Afspraak maken</router-link>
     </nav>
 
 

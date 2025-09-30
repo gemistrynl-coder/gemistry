@@ -116,17 +116,18 @@
     <!-- GEMISTRY GEMS POPUP -->
     <div v-if="showGemPopup" class="gem-modal-overlay" @click.self="closeGemPopup">
       <div class="gem-modal">
-        <button class="gem-close" @click="closeGemPopup" aria-label="Sluiten">×</button>
         <div class="gem-header">
           <h2>Gemistry’s gems.</h2>
-          <div class="gem-divider"></div>
+          <button class="gem-close" @click="closeGemPopup" aria-label="Sluiten">×</button>
         </div>
+        <div class="gem-divider"></div>
+
+
         <div class="gem-body">
           <div class="gem-copy">
             <p>Onze klanten en modellen zijn het hart van ons merk...</p>
             <p>We zijn continu op zoek naar mensen die ons merk willen vertegenwoordigen...</p>
             <p class="gem-cta-wrap">
-              <button class="gem-cta" @click="closeGemPopup">MAAK EEN AFSPRAAK</button>
             </p>
           </div>
           <div class="gem-image-wrap">
@@ -142,7 +143,9 @@
                   @click="goToGem(i)"
               />
             </div>
+
           </div>
+          <button class="gem-cta" @click="closeGemPopup">MAAK EEN AFSPRAAK</button>
         </div>
       </div>
     </div>
@@ -150,11 +153,14 @@
     <!-- CLOSE-UP POPUP -->
     <div v-if="showCloseupPopup" class="gem-modal-overlay" @click.self="closeCloseupPopup">
       <div class="gem-modal">
-        <button class="gem-close" @click="closeCloseupPopup" aria-label="Sluiten">×</button>
+        <!-- X KNOP BINNEN DE MODAL -->
         <div class="gem-header">
           <h2>Close-up view</h2>
-          <div class="gem-divider"></div>
+          <button class="gem-close" @click="closeCloseupPopup" aria-label="Sluiten">×</button>
         </div>
+        <div class="gem-divider"></div>
+
+
         <div class="gem-body">
           <div class="gem-copy">
             <p>Details make the difference...</p>
@@ -164,18 +170,24 @@
             <button class="gem-nav gem-prev" @click="prevCloseup" aria-label="Vorige">‹</button>
             <button class="gem-nav gem-next" @click="nextCloseup" aria-label="Volgende">›</button>
             <div class="gem-dots">
-              <span
-                  v-for="(c, i) in closeupImages"
-                  :key="c"
-                  class="gem-dot"
-                  :class="{ active: i === currentCloseupIndex }"
-                  @click="goToCloseup(i)"
-              />
+          <span
+              v-for="(c, i) in closeupImages"
+              :key="c"
+              class="gem-dot"
+              :class="{ active: i === currentCloseupIndex }"
+              @click="goToCloseup(i)"
+          />
             </div>
           </div>
+          <!-- Button onderin -->
+          <button class="gem-cta" @click="() => { closeCloseupPopup(); openAppointmentPopup(); }">
+            MAAK EEN AFSPRAAK
+          </button>
         </div>
+
       </div>
     </div>
+
 
     <!-- APPOINTMENT POPUP -->
     <div
@@ -755,31 +767,40 @@ footer {
   background: #651A1A;
   border-radius: 10px;
   padding: 20px;
-  width: 95%;
+  width: 75%;
   max-width: 800px;
-  height: 45vh;
+  height: auto;
   color: #f2efe8;
 }
 .gem-close {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  font-size: 26px;
+  font-size: 34px;        /* groot kruis */
+  font-weight: bold;
   background: none;
   border: none;
+  color: #F2EFE8;
   cursor: pointer;
+  transition: transform .15s ease;
 }
-.gem-close:hover { transform: scale(1.06); }
+
+.gem-close:hover {
+  transform: scale(1.2);
+}
 
 .gem-header {
-  padding: 20px 26px 10px;
+  display: flex;
+  justify-content: space-between; /* titel links - X rechts */
+  align-items: center;            /* netjes verticaal gecentreerd */
+  padding: 16px 20px;
 }
+
 .gem-header h2 {
   margin: 0;
   font-family: "Vogue", Georgia, serif;
   font-size: clamp(28px, 3.2vw, 40px);
   letter-spacing: .5px;
+  color: #F2EFE8;
 }
+
 .gem-divider {
   margin-top: 12px;
   height: 1px;
@@ -813,8 +834,8 @@ footer {
   letter-spacing: .4px;
   cursor: pointer;
   transition: background .2s ease, color .2s ease, transform .15s ease;
+  font-size: 20px;
 }
-.gem-cta:hover { background: #F2EFE8; color: #651A1A; transform: translateY(-1px); }
 
 /* GEM & CLOSEUP POPUP IMAGE */
 .gem-image-wrap {
@@ -848,6 +869,7 @@ footer {
   border-radius: 999px;
   cursor: pointer;
   transition: transform .15s ease, background .15s ease;
+  font-size: 28px;
 }
 .gem-nav:hover { transform: translateY(-50%) scale(1.06); background: rgba(0,0,0,.5); }
 .gem-prev { left: 12px; }

@@ -30,6 +30,11 @@
         </div>
       </div>
     </section>
+    <!-- DEBUG: toon API data -->
+    <pre style="text-align:left; font-size:12px; background:#eee; padding:10px; overflow-x:auto;">
+      {{ services }}
+    </pre>
+
 
     <!-- FOOTER -->
     <footer>
@@ -140,10 +145,21 @@ function formatPrice(price) {
 }
 
 function resolveImage(path) {
-  if (!path) return "../assets/img/placeholder.jpg";
-  // Strip "@/"" uit database values
-  return path.replace(/^@\//, "/");
+  // Als er niks in de DB staat → toon placeholder
+  if (!path) return "/img/placeholder.jpg";
+
+  // Strip "@/..."
+  const cleanPath = path.replace(/^@\//, "/");
+
+  // 🚨 Check of het pad naar public/img wijst
+  if (!cleanPath.startsWith("/img/")) {
+    return "/img/placeholder.jpg";
+  }
+
+  return cleanPath;
 }
+
+
 
 
 
