@@ -3,7 +3,6 @@ import express from "express";
 import mysql from "mysql2/promise";
 import cors from "cors";
 import { google } from "googleapis";
-import fs from "fs";
 
 // ===============================
 // CONFIG
@@ -40,8 +39,6 @@ const pool = mysql.createPool({
 // ===============================
 // GOOGLE DRIVE SETUP
 // ===============================
-
-
 const credentials = {
     client_email: process.env.GOOGLE_CLIENT_EMAIL,
     private_key: process.env.GOOGLE_PRIVATE_KEY,
@@ -54,7 +51,6 @@ const auth = new google.auth.GoogleAuth({
 
 const drive = google.drive({ version: "v3", auth });
 
-
 // ID van jouw `blogpost` map (rechtsklik → "Link ophalen")
 const BLOGPOST_FOLDER_ID = "1Vo8uUqYxxSoUPrZrNKG77rcdOc67IVhd";
 
@@ -65,6 +61,14 @@ async function readFileContent(fileId) {
         { responseType: "text" }
     );
     return res.data;
+}
+
+async function downloadFileContent(fileId) {
+    const res = await drive.files.get(
+        { fileId, alt: "media" },
+        { responseType: "arraybuffer" } // raw binary
+    );
+    return Buffer.from(res.data).toString("base64");
 }
 
 async function listFilesInFolder(folderId) {
@@ -135,28 +139,39 @@ app.get("/api/prijslijst-items/:categorieId", async (req, res) => {
     }
 });
 
-// ✅ Blogposts ophalen vanuit Google Drive
+// ✅ Blogposts ophalen vanuit Google Drive (incl. alle JSON-velden + meerdere images)
 app.get("/api/blogposts", async (req, res) => {
     try {
         const blogFolders = await listFilesInFolder(BLOGPOST_FOLDER_ID);
-
         const posts = [];
+
         for (const folder of blogFolders) {
             if (folder.mimeType !== "application/vnd.google-apps.folder") continue;
 
             const files = await listFilesInFolder(folder.id);
 
             const jsonFile = files.find(f => f.name.endsWith(".json"));
-            const imgFile = files.find(f => f.mimeType && f.mimeType.startsWith("image/"));
-
             if (!jsonFile) continue;
 
+            // JSON inlezen
             const jsonContent = await readFileContent(jsonFile.id);
             const jsonData = JSON.parse(jsonContent);
 
+            // Alle afbeeldingen ophalen
+            const imgFiles = files.filter(f => f.mimeType && f.mimeType.startsWith("image/"));
+            const images = [];
+            for (const imgFile of imgFiles) {
+                const base64 = await downloadFileContent(imgFile.id);
+                images.push({
+                    mimeType: imgFile.mimeType,
+                    data: base64
+                });
+            }
+
+            // Voeg alles samen
             posts.push({
-                ...jsonData,
-                imageUrl: imgFile ? `https://drive.google.com/uc?id=${imgFile.id}` : null
+                ...jsonData, // alle velden uit JSON
+                images       // alle images in de map
             });
         }
 
