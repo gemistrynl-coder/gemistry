@@ -46,15 +46,18 @@ if (!process.env.GOOGLE_KEY_JSON) {
     process.exit(1);
 }
 
-// Probeer env var GOOGLE_KEY_JSON (Railway) → anders lokaal JSON bestand
-const credentials = JSON.parse(process.env.GOOGLE_KEY_JSON);
+const credentials = {
+    client_email: process.env.GOOGLE_CLIENT_EMAIL,
+    private_key: process.env.GOOGLE_PRIVATE_KEY,
+};
+
 const auth = new google.auth.GoogleAuth({
     credentials,
     scopes: ["https://www.googleapis.com/auth/drive.readonly"],
 });
 
-
 const drive = google.drive({ version: "v3", auth });
+
 
 // ID van jouw `blogpost` map (rechtsklik → "Link ophalen")
 const BLOGPOST_FOLDER_ID = "1Vo8uUqYxxSoUPrZrNKG77rcdOc67IVhd";
