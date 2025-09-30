@@ -289,14 +289,15 @@ function closeServicePopup() {
 }
 
 .service-modal {
+  margin-top: 50px;
   background: #f2efe8;
   color: #651a1a;
   border-radius: 18px;
-  padding: 100px 30px 30px 30px;
+  padding: 30px;
   width: 90%;
   height: 80%;
   max-width: 750px;
-  max-height: 85vh;
+  max-height: 80vh;
   overflow-y: auto;
   position: relative;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
@@ -315,7 +316,6 @@ function closeServicePopup() {
 }
 
 .gem-close {
-  margin-top: 70px;
   position: absolute;
   top: 15px;
   right: 18px;
