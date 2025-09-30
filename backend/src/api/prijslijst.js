@@ -38,21 +38,22 @@ const pool = mysql.createPool({
 })();
 
 // ===============================
-// GOOGLE DRIVE SETUP 
+// GOOGLE DRIVE SETUP
 // ===============================
 
-// Probeer env var GOOGLE_KEY_JSON (Railway) → anders lokaal JSON bestand
-let credentials;
-if (process.env.GOOGLE_KEY_JSON) {
-    credentials = JSON.parse(process.env.GOOGLE_KEY_JSON);
-} else {
-    credentials = JSON.parse(fs.readFileSync("public/blog-473623-7fd7db1d0012.json"));
+if (!process.env.GOOGLE_KEY_JSON) {
+    console.error("❌ GOOGLE_KEY_JSON ontbreekt! Voeg de service account JSON toe in Railway → Variables.");
+    process.exit(1);
 }
 
+// Probeer env var GOOGLE_KEY_JSON (Railway) → anders lokaal JSON bestand
+const credentials = JSON.parse(process.env.GOOGLE_KEY_JSON);
 const auth = new google.auth.GoogleAuth({
     credentials,
     scopes: ["https://www.googleapis.com/auth/drive.readonly"],
 });
+
+
 const drive = google.drive({ version: "v3", auth });
 
 // ID van jouw `blogpost` map (rechtsklik → "Link ophalen")
