@@ -29,7 +29,7 @@
             </div>
           </section>
         </div>
-        <hr style=" width: 100%; padding: 0 10px 0 10px">
+        <hr style=" width: 100%; padding: 0 10px 0 10px"> 
 
         <div id="why_gemistry">
           <p id="why_gemistry_title">Why Gemistry?</p>
