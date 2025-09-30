@@ -6,7 +6,6 @@ import OverOns from '@/mobile/pages/over_ons.vue'
 
 const routes = [
     { path: '/', name: 'Home', component: Home },
-    { path: '/contact', name: 'Contact', component: ContactUs },
     { path: '/services', name: 'Services', component: OurServices },
     { path: '/over_ons', name: 'OverOns', component: OverOns },
 ]
