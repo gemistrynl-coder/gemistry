@@ -16,7 +16,7 @@
                 <p>OPRICHTER</p>
               </div>
             </div>
-            <img src="@/img/ons/didi_dean.jpg" alt="Didi en Dean" />
+            <img src="@/desktop/assets/img/ons/didi_dean.jpg" alt="Didi en Dean" />
           </div>
           <div class="intro-text">
             <p>
@@ -61,8 +61,8 @@
           </div>
 
           <div class="story-images">
-            <img src="@/img/ons/krant.jpg" alt="Krant" />
-            <img src="@/img/ons/gems.jpg" alt="Gems" />
+            <img src="@/desktop/assets/img/ons/krant.jpg" alt="Krant" />
+            <img src="@/desktop/assets/img/ons/gems.jpg" alt="Gems" />
           </div>
         </div>
 

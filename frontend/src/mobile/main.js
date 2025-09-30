@@ -3,7 +3,7 @@ import App from './App.vue'
 import VCalendar from 'v-calendar'
 import 'v-calendar/style.css'
 
-import router from './router'
+import router from './router/index.js'
 
 export default function start() {
     const app = createApp(App)

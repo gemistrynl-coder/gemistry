@@ -96,10 +96,10 @@
           <h3>Already following up?</h3>
           <div id="social_media_icons">
             <a href="https://www.instagram.com/gemistry.ams/" target="_blank">
-              <img src="@mobile/img/icons/insta_icon.png" alt="Instagram" />
+              <img src="@/desktop/assets/img/icons/insta_icon.png" alt="Instagram" />
             </a>
             <a href="https://www.tiktok.com/@gemistry" target="_blank">
-              <img src="@mobile/img/icons/tiktok_icon.png" alt="TikTok" />
+              <img src="@/desktop/assets/img/icons/tiktok_icon.png" alt="TikTok" />
             </a>
             <a href="" id="contact">contact</a>
           </div>
@@ -201,7 +201,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch } from "vue";
-import '@/popup/bevestigen.vue'
 
 // ==============================
 // BLOGPOSTS DYNAMISCH LADEN
@@ -268,7 +267,7 @@ const closeAppointmentPopup = () => { showAppointmentPopup.value = false; };
 // GEM POPUP
 // ==============================
 const gemModules = import.meta.glob(
-    "/src/img/gems/*.{png,jpg,jpeg,gif,webp,JPG}",
+    "@/desktop/assets/img/gems/*.{png,jpg,jpeg,gif,webp,JPG}",
     { eager: true }
 );
 const gemImages = Object.values(gemModules).map((m: any) => m.default) as string[];
@@ -304,7 +303,7 @@ const prevGem = () => goToGem(currentGemIndex.value - 1);
 // CLOSEUP POPUP
 // ==============================
 const closeupModules = import.meta.glob(
-    "/src/img/closeup/*.{png,jpg,jpeg,gif,webp,JPG}",
+    "@/desktop/assets/img/closeup/*.{png,jpg,jpeg,gif,webp,JPG}",
     { eager: true }
 );
 const closeupImages = Object.values(closeupModules).map((m: any) => m.default) as string[];
@@ -340,7 +339,7 @@ const prevCloseup = () => goToCloseup(currentCloseupIndex.value - 1);
 // RANDOM IMAGES (3 tegelijk)
 // ==============================
 const modules = import.meta.glob(
-    "/src/img/random_image/*.{png,jpg,jpeg,gif,webp,JPG}",
+    "../assets/img/random_image/*.{png,jpg,jpeg,gif,webp,JPG}",
     { eager: true }
 );
 const images = Object.values(modules).map((m: any) => m.default);
@@ -368,21 +367,21 @@ onBeforeUnmount(() => { if (intervalId) clearInterval(intervalId); });
 // ==============================
 const galleryItems = ref([
   {
-    foto: new URL('@mobile/img/gems/IMG_6667.jpg', import.meta.url).href,
+    foto: new URL('@/desktop/assets/img/gems/IMG_6667.jpg', import.meta.url).href,
     title: "GEMISTRY GEMS",
     naam: "Ines",
     description: '"Ik wilde al een tijd een toothgem uitproberen..."',
     popup: "gem",
   },
   {
-    foto: new URL('@mobile/img/closeup/kaolo.JPG', import.meta.url).href,
+    foto: new URL('@/desktop/assets/img/closeup/kaolo.JPG', import.meta.url).href,
     title: "CLOSE-UP VIEW",
     naam: "Chelsey",
     description: '"Ik had een ontwerp uitgekozen..."',
     popup: "closeup",
   },
   {
-    foto: new URL('@mobile/img/random_image/IMG_4072.jpg', import.meta.url).href,
+    foto: new URL('@/desktop/assets/img/random_image/IMG_4072.jpg', import.meta.url).href,
     title: "EVENTS",
     naam: "Club Nyx",
     description: "Bij Club NYX mochten wij bezoekers voorzien...",
@@ -439,11 +438,11 @@ const handleCardClick = (item: GalleryItem) => {
 
 /* Main image */
 #main_image {
-  height: 90vh;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url("@mobile/img/main/image1.jpeg");
+  background-image: url("../assets/img/main/image1.jpeg");
   background-position: center center;
   background-size: cover;
   position: relative;
@@ -455,6 +454,8 @@ const handleCardClick = (item: GalleryItem) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 40px;
+
   opacity: 0; /* eerst verborgen */
   transform: translateX(-100px); /* startpositie */
   animation: slideIn 1.5s ease-out forwards; /* start animatie */
@@ -462,10 +463,9 @@ const handleCardClick = (item: GalleryItem) => {
 
 #main_image_div #image_title {
   color: #F2EFE8;
-  font-size: 90px !important;
+  font-size: 100px !important;
   font-family: "Vogue";
   text-align: center;
-  margin-top: 0;
 }
 
 /* Keyframes voor insliden */
@@ -504,20 +504,20 @@ const handleCardClick = (item: GalleryItem) => {
 
 /* Afspraak blok */
 #explore {
-  padding: 20px;
+  padding: 30px 0 30px 0;
   background: #651A1A;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 40px;
+  margin: 10px;
 }
 
 #explore p{
-  font-size: 40px;
+  font-size: 50px;
   margin: 0;
   color: #F2EFE8;
-  margin-bottom: 20px;
 }
 
 
@@ -539,7 +539,7 @@ const handleCardClick = (item: GalleryItem) => {
 .gallery-card {
   background: #F2EFE8;
   border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.62);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   width: 380px;
   display: flex;
@@ -576,7 +576,11 @@ const handleCardClick = (item: GalleryItem) => {
 }
 
 .gallery-card:hover {
-
+  color: #651a1a;
+  transition: 0.3s;
+  transform: scale(1.1);
+  font-size: 13px;
+  cursor: pointer;
 }
 
 .gallery-card:hover p{

@@ -6,7 +6,7 @@ const forceMobile = urlParams.get('mobile') === 'true'
 const forceDesktop = urlParams.get('desktop') === 'true'
 
 if (forceMobile || (!forceDesktop && isMobile)) {
-    import('./mobile/main.js').then(({ default: start }) => start())
+    import('./src/mobile/main.js').then(({ default: start }) => start())
 } else {
-    import('./desktop/main.js').then(({ default: start }) => start())
+    import('./src/desktop/main.js').then(({ default: start }) => start())
 }
