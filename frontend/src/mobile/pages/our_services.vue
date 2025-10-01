@@ -40,43 +40,42 @@
     </footer>
 
     <!-- SERVICE POPUP (volledig scherm) -->
-    <div v-if="showPopup" class="gem-modal-overlay">
-      <div class="service-modal">
-        <!-- Header -->
-        <!-- Header -->
-        <div class="gem-header">
-          <h2>{{ selectedService?.naam }}</h2>
-          <button class="gem-close" @click="closeServicePopup" aria-label="Sluiten">×</button>
-        </div>
-        <div class="gem-divider"></div>
-
-
-        <!-- Body -->
-        <div class="gem-body">
-          <div class="popup-left">
-            <img :src="resolveImage(selectedService?.image_url)" :alt="selectedService?.naam" />
+    <transition name="popup-fade">
+      <div v-if="showPopup" class="gem-modal-overlay">
+        <div class="service-modal">
+          <div class="gem-header">
+            <h2>{{ selectedService?.naam }}</h2>
+            <button class="gem-close" @click="closeServicePopup" aria-label="Sluiten">×</button>
           </div>
-          <div class="popup-right">
-            <p class="popup-price">€{{ formatPrice(selectedService?.prijs) }}</p>
-            <p>{{ selectedService?.description }}</p>
-            <p class="popup-tldr">{{ selectedService?.tldr }}</p>
+          <div class="gem-divider"></div>
 
-            <div v-if="popupItems.length">
-              <h4>Items</h4>
-              <ul>
-                <li v-for="it in popupItems" :key="it.id">
-                  {{ it.naam }} - €{{ formatPrice(it.prijs) }}
-                </li>
-              </ul>
+          <div class="gem-body">
+            <div class="popup-left">
+              <img :src="resolveImage(selectedService?.image_url)" :alt="selectedService?.naam" />
             </div>
+            <div class="popup-right">
+              <p class="popup-price">€{{ formatPrice(selectedService?.prijs) }}</p>
+              <p>{{ selectedService?.description }}</p>
+              <p class="popup-tldr">{{ selectedService?.tldr }}</p>
 
-            <button class="cta-button" @click="openBooking">
-              Maak nu een afspraak
-            </button>
+              <div v-if="popupItems.length">
+                <h4>Items</h4>
+                <ul>
+                  <li v-for="it in popupItems" :key="it.id">
+                    {{ it.naam }} - €{{ formatPrice(it.prijs) }}
+                  </li>
+                </ul>
+              </div>
+
+              <button class="cta-button" @click="openBooking">
+                Maak nu een afspraak
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </transition>
+
   </div>
 </template>
 
@@ -91,17 +90,17 @@ const showPopup = ref(false)
 const selectedService = ref(null)
 const popupItems = ref([])
 
-// services.value = [
-//   {
-//     id: 1,
-//     naam: "Nep Service",
-//     prijs: 49.99,
-//     tldr: "Dit is een korte beschrijving van een nep service.",
-//     description: "Hier staat een uitgebreide uitleg over de nep service die je normaal in de database hebt staan.",
-//     type: "basic",
-//     image_url: "/img/placeholder.jpg"
-//   }
-// ]
+services.value = [
+  {
+    id: 1,
+    naam: "Nep Service",
+    prijs: 49.99,
+    tldr: "Dit is een korte beschrijving van een nep service.",
+    description: "Hier staat een uitgebreide uitleg over de nep service die je normaal in de database hebt staan.",
+    type: "basic",
+    image_url: "/img/placeholder.jpg"
+  }
+]
 
 
 // Data ophalen
@@ -305,10 +304,7 @@ function openBooking() {
   cursor: pointer;
   transition: all 0.2s ease;
 }
-.gem-close:hover {
-  background: #651a1a;
-  color: #fff;
-}
+
 
 .gem-header {
   display: flex;
@@ -334,13 +330,13 @@ function openBooking() {
 
 .gem-body {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 25px;
   align-items: flex-start;
   margin-top: 20px;
 }
 .gem-body img {
-  width: 260px;
+  width: 100%;
   border-radius: 12px;
   object-fit: cover;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
@@ -367,10 +363,45 @@ function openBooking() {
   margin-top: 4px;
 }
 
-.cta-button { margin-top: 20px; padding: 12px 24px; font-size: 18px; font-weight: bold; color: #fff; background: #651a1a; border: none; border-radius: 10px; cursor: pointer; transition: all 0.25s ease; align-self: flex-start; }
+.cta-button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  background: #651a1a;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  align-self: flex-start;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.cta-button:hover {
+  background: #7a2323;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+}
+
+.cta-button:active {
+  background: #4a1111;
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* TRANSITIONS */
+.popup-fade-enter-active,
+.popup-fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.popup-fade-enter-from,
+.popup-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
 
 
 
-
-#footer_legal { background-color: #651A1A; color: white; text-align: center; padding: 20px; font-size: 14px; position: fixed; bottom: 0; width: 100%;}
+#footer_legal { background-color: #651A1A; color: white; text-align: center; padding: 20px; font-size: 14px; position: relative; bottom: 0; width: 100%;}
 </style>
