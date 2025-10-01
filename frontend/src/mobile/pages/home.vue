@@ -101,11 +101,45 @@
             <a href="https://www.tiktok.com/@gemistry" target="_blank">
               <img src="../assets/img/icons/tiktok_icon.png" alt="TikTok" />
             </a>
-            <a href="" id="contact">contact</a>
+          </div>
+
+          <!-- ✅ Contact blok direct eronder -->
+          <div id="contact_us">
+            <h2>Contact Us</h2>
+            <div class="contact-columns">
+
+              <!-- LEFT -->
+              <div class="contact-col">
+                <p><strong>Phone</strong><br>+31 658965703</p>
+                <p><strong>Email</strong><br>gemistrynl@gmail.com</p>
+                <p><strong>BTW-NUMMER</strong><br>NL005301771B83</p>
+                <p><strong>Didi Zeilstra</strong></p>
+              </div>
+
+              <!-- MIDDLE (foto) -->
+              <div class="contact-col">
+              </div>
+
+              <!-- RIGHT -->
+              <div class="contact-col">
+                <p><strong>Address</strong><br>Amsterdam Zuid</p>
+                <p><strong>BTW-NUMMER</strong><br>NL005301771B83</p>
+                <p><strong>Dean Davis</strong></p>
+              </div>
+
+            </div>
+
+            <p style="margin-top:20px;">
+              Voor samenwerkingen of meer informatie mail naar:
+              <a href="mailto:gemistrynl@gmail.com">gemistrynl@gmail.com</a>
+            </p>
           </div>
         </div>
+
         <div id="right"></div>
       </div>
+
+
 
       <div id="footer_legal">
         <p>Privacy policy | Algemene voorwaarden</p>
@@ -966,6 +1000,27 @@ footer {
   overflow: hidden !important;
 }
 
+#contact_us {
+  padding: 20px;
+  text-align: center;
+}
+
+#contact_us h2 {
+  margin: 30px 0 20px 0;
+}
+
+.contact-columns {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap; /* ✅ mobiel breekt alles netjes */
+  margin-bottom: 20px;
+}
+
+.contact-col {
+  flex: 1;
+  min-width: 200px;
+}
 
 
 

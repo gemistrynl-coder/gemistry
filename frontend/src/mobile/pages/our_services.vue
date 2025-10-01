@@ -165,8 +165,7 @@ async function openServicePopup(item) {
 
   // Neppe items voor test
   popupItems.value = [
-    { id: 101, categorie_id: 1, naam: "Extra glitter", prijs: 9.99 },
-    { id: 102, categorie_id: 1, naam: "Deluxe afwerking", prijs: 19.99 }
+    { id: 101, categorie_id: 1, naam: "Extra gem", prijs: 9.99 }
   ];
 }
 
@@ -377,6 +376,8 @@ function openBooking() {
   align-self: flex-start;
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
+
+
 
 .cta-button:hover {
   background: #7a2323;
