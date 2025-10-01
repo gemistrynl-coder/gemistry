@@ -369,11 +369,8 @@ function openBooking() {
 
 .cta-button { margin-top: 20px; padding: 12px 24px; font-size: 18px; font-weight: bold; color: #fff; background: #651a1a; border: none; border-radius: 10px; cursor: pointer; transition: all 0.25s ease; align-self: flex-start; }
 
-@media (max-width: 800px) {
-  .gem-body {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-}
+
+
+
+#footer_legal { background-color: #651A1A; color: white; text-align: center; padding: 20px; font-size: 14px; position: fixed; bottom: 0; width: 100%;}
 </style>
