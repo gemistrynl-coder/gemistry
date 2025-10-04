@@ -53,8 +53,9 @@
         </button>
 
         <!-- Header -->
+        <!-- Header -->
         <div class="gem-header">
-          <h2>{{ selectedService?.selectedItem?.naam }}</h2>
+          <h2>{{ selectedService?.naam }}</h2>
           <div class="gem-divider"></div>
         </div>
 
@@ -63,16 +64,14 @@
           <div class="popup-left">
             <img
                 :src="resolveImage(selectedService?.image_url)"
-                :alt="selectedService?.selectedItem?.naam"
+                :alt="selectedService?.naam"
             />
           </div>
           <div class="popup-right">
-            <p class="popup-price" v-if="selectedService?.selectedItem?.prijs">
-              €{{ formatPrice(selectedService?.selectedItem?.prijs) }}
-            </p>
-            <p>{{ selectedService?.selectedItem?.description }}</p>
-            <p class="popup-tldr">{{ selectedService?.tldr }}</p>
+            <!-- categorie info -->
+            <p class="popup-tldr">{{ selectedService?.description }}</p>
 
+            <!-- items -->
             <div v-if="selectedService?.items?.length">
               <h4>Afspraken</h4>
               <ul>
