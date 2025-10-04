@@ -1,33 +1,29 @@
 <template>
   <div class="page">
     <section id="services">
-      <!-- 1) Groepeer per categorie-type -->
       <div v-for="group in groupedServices" :key="group.type" class="group-block">
-        <!-- 2) Categories binnen dit type -->
-        <div v-for="cat in group.categories" :key="cat.id" class="category-block">
-          <h3 class="category-title">
-            {{ cat.naam }} <span class="type-chip">({{ cat.type }})</span>
-          </h3>
-          <div class="category-divider"></div>
+        <h2 class="group-title">{{ group.type.toUpperCase() }}</h2>
+        <div class="category-divider"></div>
 
-          <!-- alleen de kaart -->
-          <div class="services-grid">
-            <div class="service-card" @click="openServicePopup(cat.items?.[0], cat)">
-              <div class="card-image">
-                <img :src="resolveImage(cat.image_url)" :alt="cat.naam" />
-              </div>
-              <div class="card-body">
-                <h3>{{ cat.naam }}</h3>
-                <p class="desc">{{ cat.tldr }}</p>
-                <p v-if="Array.isArray(cat.items) && cat.items.length">
-                  {{ cat.items.length }} opties beschikbaar
-                </p>
-              </div>
+        <!-- grid met alle categories van dit type -->
+        <div class="services-grid">
+          <div v-for="cat in group.categories" :key="cat.id" class="service-card"
+               @click="openServicePopup(cat.items?.[0], cat)">
+            <div class="card-image">
+              <img :src="resolveImage(cat.image_url)" :alt="cat.naam" />
+            </div>
+            <div class="card-body">
+              <h3>{{ cat.naam }}</h3>
+              <p class="desc">{{ cat.tldr }}</p>
+              <p v-if="Array.isArray(cat.items) && cat.items.length">
+                {{ cat.items.length }} opties beschikbaar
+              </p>
             </div>
           </div>
-        </div> <!-- /category-block -->
-      </div> <!-- /group-block -->
+        </div>
+      </div>
     </section>
+
 
     <!-- FOOTER -->
     <footer>
