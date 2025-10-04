@@ -134,14 +134,20 @@ const showPopup = ref(false);
 const selectedService = ref(null);
 const showCalendly = ref(false);
 
-// Data ophalen
+// Stap 1: Data ophalen
 onMounted(async () => {
+  console.log("DEBUG: onMounted gestart");
   try {
     const res = await fetch(`${API_BASE_URL}/api/prijslijst`);
-    services.value = await res.json();
+    console.log("DEBUG: API response status =", res.status);
+    const json = await res.json();
+    console.log("DEBUG: API response JSON =", json);
+    services.value = json;
   } catch (err) {
-    console.error("❌ API error:", err);
+    console.error("DEBUG: API fout =", err);
   }
+
+  console.log("DEBUG: services.value na fetch =", services.value);
 
   // Calendly script inladen
   const script = document.createElement("script");
@@ -150,8 +156,9 @@ onMounted(async () => {
   document.body.appendChild(script);
 });
 
-// Scroll lock
+// Scroll lock helpers
 function lockScroll() {
+  console.log("DEBUG: Scroll lock aan");
   const scrollBarWidth =
       window.innerWidth - document.documentElement.clientWidth;
   document.body.style.overflow = "hidden";
@@ -160,10 +167,14 @@ function lockScroll() {
   }
 }
 function unlockScroll() {
+  console.log("DEBUG: Scroll lock uit");
   document.body.style.overflow = "";
   document.body.style.paddingRight = "";
 }
+
+// Popup watchers
 watch([showPopup, showCalendly], (states) => {
+  console.log("DEBUG: Popup states veranderd =", states);
   if (states.some(Boolean)) {
     lockScroll();
   } else {
@@ -171,8 +182,9 @@ watch([showPopup, showCalendly], (states) => {
   }
 });
 
-// Groepering
+// Stap 2: Data in de template
 const groupedServices = computed(() => {
+  console.log("DEBUG: groupedServices recomputed =", services.value);
   return services.value;
 });
 
@@ -185,18 +197,21 @@ function resolveImage(path) {
   return path.replace(/^@\//, "/");
 }
 
-// Popup
+// Popup functies
 function openServicePopup(cat) {
+  console.log("DEBUG: openServicePopup =", cat);
   selectedService.value = cat;
   showPopup.value = true;
 }
 function closeServicePopup() {
+  console.log("DEBUG: closeServicePopup");
   showPopup.value = false;
   selectedService.value = null;
 }
 
-// Calendly popup (optioneel)
+// Calendly
 async function openBooking(url) {
+  console.log("DEBUG: openBooking met url =", url);
   closeServicePopup();
   showCalendly.value = true;
 
@@ -212,9 +227,11 @@ async function openBooking(url) {
   }
 }
 function closeCalendly() {
+  console.log("DEBUG: closeCalendly");
   showCalendly.value = false;
 }
 </script>
+
 
 
 <style scoped>
