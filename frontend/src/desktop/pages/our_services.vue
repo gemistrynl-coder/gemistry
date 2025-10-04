@@ -261,7 +261,7 @@ function resolveImage(path) {
 .page { width: 100%; min-height: 100vh; background-color: #f2efe8; clip-path: inset(0px -20px -20px -20px); }
 
 /* GROUP */
-.group-block { margin-bottom: 40px; }
+.group-block { margin-bottom: 40px; text-align: center; }
 
 /* CATEGORIE */
 .category-block { margin-bottom: 60px; text-align: center; }
