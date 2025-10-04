@@ -4,7 +4,7 @@
     <header>
       <div class="header-inner">
         <!-- LOGO / TITEL -->
-        <a href="/" style="text-decoration: none;"><h3 class="logo">. GEMISTRY .</h3></a>
+        <a href="/" style="text-decoration: none;"><h3 class="logo">GEMISTRY</h3></a>
 
         <!-- HAMBURGER BUTTON (alleen mobiel) -->
         <button
