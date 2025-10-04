@@ -1,14 +1,15 @@
 <template>
   <div id="app">
     <header>
+      <h3>. GEMISTRY .</h3>
       <nav>
         <a href="/">Home</a>
         <a href="/over_ons">Over ons</a>
-        <h3>. GEMISTRY .</h3>
         <a href="/services">Services</a>
-        <a href=""></a>
       </nav>
+
     </header>
+
     <hr>
 
 
@@ -49,9 +50,12 @@ header {
   align-items: center;
   flex-wrap: wrap;
   padding: 0 10px 0 10px;
+  padding-bottom: 10px;
 }
 
 header nav {
+  margin-bottom: 10px;
+
   display: flex;
   justify-content: center;   /* alles in het midden */
   align-items: center;
@@ -75,7 +79,7 @@ header nav a:hover {
   text-decoration: underline;
 }
 
-header nav h3 {
+header h3 {
   font-size: 58px;
   font-weight: bold;
   margin: 0;
