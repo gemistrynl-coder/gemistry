@@ -12,18 +12,19 @@ const PORT = process.env.PORT || 8000;
 // CORS CONFIG
 // ===============================
 const allowedOrigins = [
-    "http://localhost:5173",             // voor lokaal testen
-    "https://www.gemistrytoothgems.nl"   // productie frontend
+    "http://localhost:5173",
+    "http://192.168.178.50:5173",  // zonder slash!
+    "https://www.gemistrytoothgems.nl"
 ];
+
 
 app.use(
     cors({
         origin: function (origin, callback) {
-            // sta ook requests zonder origin toe (zoals curl/postman)
             if (!origin || allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
-                callback(new Error("Not allowed by CORS"));
+                callback(new Error("Not allowed by CORS: " + origin));
             }
         },
         methods: ["GET", "POST", "PUT", "DELETE"],
@@ -34,7 +35,7 @@ app.use(
 app.use(express.json());
 
 // ===============================
-// DB CONNECTIE (Railway via ENV)
+// DB CONNECTIE (directe Railway string)
 // ===============================
 const pool = mysql.createPool({
     host: process.env.MYSQLHOST,
@@ -48,18 +49,6 @@ const pool = mysql.createPool({
 });
 
 // ===============================
-// HELPERS
-// ===============================
-function parseItems(row) {
-    if (!row.items) return [];
-    try {
-        return JSON.parse(row.items);
-    } catch {
-        return [];
-    }
-}
-
-// ===============================
 // ENDPOINTS
 // ===============================
 app.get("/api/prijslijst", async (req, res) => {
@@ -68,31 +57,25 @@ app.get("/api/prijslijst", async (req, res) => {
             "SELECT id, naam, description, tldr, prijs, type, image_url, items FROM prijslijst_categorie ORDER BY type, id"
         );
 
-        const categories = [];
+        const categories = rows.map(row => {
+            let parsedItems = [];
 
-        for (const row of rows) {
-            const items = parseItems(row);
-            if (items.length > 0) {
-                const typesSeen = {};
-                for (const item of items) {
-                    const t = item.type;
-                    if (!typesSeen[t]) {
-                        const newCat = {
-                            ...row,
-                            id: `${row.id}-${t}`, // uniek id
-                            naam: `${row.naam} (${t})`,
-                            type: t,
-                            items: [],
-                        };
-                        typesSeen[t] = newCat;
-                        categories.push(newCat);
+            if (row.items) {
+                try {
+                    // ✅ Check of het al object/array is
+                    if (typeof row.items === "string") {
+                        parsedItems = JSON.parse(row.items);
+                    } else {
+                        parsedItems = row.items; // MySQL JSON → object/array
                     }
-                    typesSeen[t].items.push(item);
+                } catch (err) {
+                    console.error("❌ Fout bij parsen items:", err);
+                    parsedItems = [];
                 }
-            } else {
-                categories.push({ ...row, items: [] });
             }
-        }
+
+            return { ...row, items: parsedItems };
+        });
 
         res.json(categories);
     } catch (err) {
