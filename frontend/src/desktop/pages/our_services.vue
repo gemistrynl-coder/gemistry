@@ -15,7 +15,7 @@
               class="service-card"
               v-for="item in cat.items"
               :key="item.naam"
-              @click="openServicePopup(cat)"   <!-- ✅ klik opent popup -->
+              @click="openServicePopup(cat)"
           >
           <div class="card-image">
             <img :src="resolveImage(cat.image_url)" :alt="cat.naam" />
@@ -74,7 +74,6 @@
           <p>{{ selectedService?.description }}</p>
           <p class="popup-tldr">{{ selectedService?.tldr }}</p>
 
-          <!-- ✅ Alle afspraken-items -->
           <div v-if="selectedService?.items?.length">
             <h4>Afspraken</h4>
             <ul>
@@ -88,7 +87,6 @@
                 <span v-else>Prijs op aanvraag</span>
                 ({{ it.duration }})
 
-                <!-- ✅ knop naar juiste URL -->
                 <a
                     class="cta-button"
                     :href="it.url"
