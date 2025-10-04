@@ -13,114 +13,113 @@
         <div class="services-grid">
           <div
               class="service-card"
-              v-for="item in cat.items"
-              :key="item.naam"
-              @click="openServicePopup(cat)"
+              :key="cat.id"
+              @click="openServicePopup(cat.items[0], cat)"
           >
-          <div class="card-image">
-            <img :src="resolveImage(cat.image_url)" :alt="cat.naam" />
+            <div class="card-image">
+              <img :src="resolveImage(cat.image_url)" :alt="cat.naam" />
+            </div>
+            <div class="card-body">
+              <h3>{{ cat.naam }}</h3>
+              <p class="desc">{{ cat.tldr }}</p>
+              <p v-if="cat.items.length">
+                {{ cat.items.length }} opties beschikbaar
+              </p>
+            </div>
           </div>
-          <div class="card-body">
-            <h3>{{ item.naam }}</h3>
-            <p class="price">
-              {{ item.prijs ? `€${formatPrice(item.prijs)}` : "Prijs op aanvraag" }}
-              ({{ item.duration }}, type: {{ item.type }})
+        </div>
+
+    </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div id="footer_legal">
+        <p>Privacy policy | Algemene voorwaarden</p>
+        <p>© 2025 Gemistry. Alle rechten voorbehouden.</p>
+      </div>
+    </footer>
+
+    <!-- SERVICE POPUP -->
+    <div
+        v-if="showPopup"
+        class="gem-modal-overlay"
+        @click.self="closeServicePopup"
+    >
+      <div class="service-modal">
+        <!-- Close -->
+        <button class="gem-close" @click="closeServicePopup" aria-label="Sluiten">
+          ×
+        </button>
+
+        <!-- Header -->
+        <div class="gem-header">
+          <h2>{{ selectedService?.selectedItem?.naam }}</h2>
+          <div class="gem-divider"></div>
+        </div>
+
+        <!-- Body -->
+        <div class="gem-body">
+          <div class="popup-left">
+            <img
+                :src="resolveImage(selectedService?.image_url)"
+                :alt="selectedService?.selectedItem?.naam"
+            />
+          </div>
+          <div class="popup-right">
+            <p class="popup-price" v-if="selectedService?.selectedItem?.prijs">
+              €{{ formatPrice(selectedService?.selectedItem?.prijs) }}
             </p>
-            <p class="desc">{{ cat.tldr }}</p>
-          </div>
-        </div>
-      </div>
-  </div>
-  </section>
+            <p>{{ selectedService?.selectedItem?.description }}</p>
+            <p class="popup-tldr">{{ selectedService?.tldr }}</p>
 
-  <!-- FOOTER -->
-  <footer>
-    <div id="footer_legal">
-      <p>Privacy policy | Algemene voorwaarden</p>
-      <p>© 2025 Gemistry. Alle rechten voorbehouden.</p>
-    </div>
-  </footer>
-
-  <!-- SERVICE POPUP -->
-  <div
-      v-if="showPopup"
-      class="gem-modal-overlay"
-      @click.self="closeServicePopup"
-  >
-    <div class="service-modal">
-      <!-- Close -->
-      <button class="gem-close" @click="closeServicePopup" aria-label="Sluiten">
-        ×
-      </button>
-
-      <!-- Header -->
-      <div class="gem-header">
-        <h2>{{ selectedService?.naam }}</h2>
-        <div class="gem-divider"></div>
-      </div>
-
-      <!-- Body -->
-      <div class="gem-body">
-        <div class="popup-left">
-          <img
-              :src="resolveImage(selectedService?.image_url)"
-              :alt="selectedService?.naam"
-          />
-        </div>
-        <div class="popup-right">
-          <p class="popup-price" v-if="selectedService?.prijs">
-            €{{ formatPrice(selectedService?.prijs) }}
-          </p>
-          <p>{{ selectedService?.description }}</p>
-          <p class="popup-tldr">{{ selectedService?.tldr }}</p>
-
-          <div v-if="selectedService?.items?.length">
-            <h4>Afspraken</h4>
-            <ul>
-              <li
-                  v-for="it in selectedService.items"
-                  :key="it.naam"
-                  style="margin-bottom: 10px"
-              >
-                {{ it.naam }} —
-                <span v-if="it.prijs">€{{ formatPrice(it.prijs) }}</span>
-                <span v-else>Prijs op aanvraag</span>
-                ({{ it.duration }})
-
-                <a
-                    class="cta-button"
-                    :href="it.url"
-                    target="_blank"
-                    rel="noopener noreferrer"
+            <div v-if="selectedService?.items?.length">
+              <h4>Afspraken</h4>
+              <ul>
+                <li
+                    v-for="it in selectedService.items"
+                    :key="it.naam"
+                    style="margin-bottom: 10px"
                 >
-                  Maak afspraak
-                </a>
-              </li>
-            </ul>
+                  {{ it.naam }} —
+                  <span v-if="it.prijs">€{{ formatPrice(it.prijs) }}</span>
+                  <span v-else>Prijs op aanvraag</span>
+                  ({{ it.duration }})
+
+                  <a
+                      class="cta-button"
+                      :href="it.url"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                  >
+                    Maak afspraak
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- CALENDLY POPUP (optioneel, nu direct via links) -->
-  <div
-      v-if="showCalendly"
-      class="gem-modal-overlay"
-      @click.self="closeCalendly"
-  >
-    <div class="service-modal" style="max-width:900px; width:95%; height:90vh;">
-      <button class="gem-close" @click="closeCalendly" aria-label="Sluiten">
-        ×
-      </button>
-      <div class="gem-header">
-        <div class="gem-divider"></div>
-      </div>
-      <div class="gem-body" style="flex-direction: column; height:100%;">
-        <div id="calendly-container" style="flex:1;"></div>
+    <!-- CALENDLY POPUP (optioneel) -->
+    <div
+        v-if="showCalendly"
+        class="gem-modal-overlay"
+        @click.self="closeCalendly"
+    >
+      <div class="service-modal" style="max-width:900px; width:95%; height:90vh;">
+        <button class="gem-close" @click="closeCalendly" aria-label="Sluiten">
+          ×
+        </button>
+        <div class="gem-header">
+          <div class="gem-divider"></div>
+        </div>
+        <div class="gem-body" style="flex-direction: column; height:100%;">
+          <div id="calendly-container" style="flex:1;"></div>
+        </div>
       </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -129,12 +128,30 @@ import { ref, onMounted, computed, watch, nextTick } from "vue";
 
 const API_BASE_URL = "https://gemistrybackend-production.up.railway.app";
 
-const services = ref([]);
+
+const services = ref([
+  {
+    id: 1,
+    naam: "Simple (TEST)",
+    description: "Testobject om frontend te debuggen",
+    tldr: "Basic designs",
+    prijs: null,
+    type: "basic",
+    image_url: "/img/closeup/img2.jpg",
+    afspraken: [],
+    items: [
+      { url: "https://calendly.com/gemistrynl/1-gem", naam: "1 Gem", prijs: 30, duration: "15m" },
+      { url: "https://calendly.com/gemistrynl/2-gems", naam: "2 Gems", prijs: 40, duration: "30m" },
+    ],
+  }
+]);
+
 const showPopup = ref(false);
 const selectedService = ref(null);
 const showCalendly = ref(false);
 
-// Stap 1: Data ophalen
+console.log("hiii");
+
 onMounted(async () => {
   console.log("DEBUG: onMounted gestart");
   try {
@@ -142,23 +159,21 @@ onMounted(async () => {
     console.log("DEBUG: API response status =", res.status);
     const json = await res.json();
     console.log("DEBUG: API response JSON =", json);
+
+    // eerst API data laden
     services.value = json;
+
+
+
   } catch (err) {
     console.error("DEBUG: API fout =", err);
   }
 
-  console.log("DEBUG: services.value na fetch =", services.value);
-
-  // Calendly script inladen
-  const script = document.createElement("script");
-  script.src = "https://assets.calendly.com/assets/external/widget.js";
-  script.async = true;
-  document.body.appendChild(script);
+  console.log("DEBUG: services.value na fetch+test =", services.value);
 });
 
 // Scroll lock helpers
 function lockScroll() {
-  console.log("DEBUG: Scroll lock aan");
   const scrollBarWidth =
       window.innerWidth - document.documentElement.clientWidth;
   document.body.style.overflow = "hidden";
@@ -167,14 +182,12 @@ function lockScroll() {
   }
 }
 function unlockScroll() {
-  console.log("DEBUG: Scroll lock uit");
   document.body.style.overflow = "";
   document.body.style.paddingRight = "";
 }
 
-// Popup watchers
+// Watchers
 watch([showPopup, showCalendly], (states) => {
-  console.log("DEBUG: Popup states veranderd =", states);
   if (states.some(Boolean)) {
     lockScroll();
   } else {
@@ -182,9 +195,9 @@ watch([showPopup, showCalendly], (states) => {
   }
 });
 
-// Stap 2: Data in de template
+// Groepering
 const groupedServices = computed(() => {
-  console.log("DEBUG: groupedServices recomputed =", services.value);
+  console.log("DEBUG: groupedServices.value =", services.value);
   return services.value;
 });
 
@@ -198,20 +211,17 @@ function resolveImage(path) {
 }
 
 // Popup functies
-function openServicePopup(cat) {
-  console.log("DEBUG: openServicePopup =", cat);
-  selectedService.value = cat;
+function openServicePopup(item, cat) {
+  selectedService.value = { ...cat, selectedItem: item };
   showPopup.value = true;
 }
 function closeServicePopup() {
-  console.log("DEBUG: closeServicePopup");
   showPopup.value = false;
   selectedService.value = null;
 }
 
-// Calendly
+// Calendly functies
 async function openBooking(url) {
-  console.log("DEBUG: openBooking met url =", url);
   closeServicePopup();
   showCalendly.value = true;
 
@@ -227,12 +237,9 @@ async function openBooking(url) {
   }
 }
 function closeCalendly() {
-  console.log("DEBUG: closeCalendly");
   showCalendly.value = false;
 }
 </script>
-
-
 
 <style scoped>
 .page {
@@ -247,7 +254,6 @@ function closeCalendly() {
   margin-bottom: 60px;
   text-align: center;
 }
-
 .category-title {
   font-size: 28px;
   font-weight: bold;
@@ -255,7 +261,6 @@ function closeCalendly() {
   text-transform: uppercase;
   letter-spacing: 2px;
 }
-
 .category-divider {
   width: 80px;
   height: 3px;
@@ -273,7 +278,6 @@ function closeCalendly() {
   gap: 35px;
   padding: 0 20px;
 }
-
 .service-card {
   display: flex;
   flex-direction: column;
@@ -437,7 +441,6 @@ function closeCalendly() {
   margin-bottom: 6px;
 }
 
-
 .cta-button {
   margin-top: 20px;
   padding: 12px 24px;
@@ -463,6 +466,7 @@ function closeCalendly() {
     max-width: 280px;
   }
 }
+
 /* ===== FOOTER ===== */
 #footer_legal {
   background-color: #651A1A;
@@ -472,9 +476,9 @@ function closeCalendly() {
   font-size: 14px;
 }
 
-#calendly-container{
+#calendly-container {
   width: 100%;
-  padding:0;
-  margin:0;
+  padding: 0;
+  margin: 0;
 }
 </style>

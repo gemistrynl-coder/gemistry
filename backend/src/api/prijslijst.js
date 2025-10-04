@@ -34,7 +34,6 @@ function parseItems(row) {
 // ENDPOINTS
 // ===============================
 
-// ✅ Alle categorieën + opgesplitst op type (basic/medium/etc.)
 router.get("/prijslijst", async (req, res) => {
     try {
         const [rows] = await pool.query(
@@ -74,7 +73,6 @@ router.get("/prijslijst", async (req, res) => {
     }
 });
 
-// ✅ Specifiek type ophalen
 router.get("/prijslijst/:type", async (req, res) => {
     try {
         const type = req.params.type;
