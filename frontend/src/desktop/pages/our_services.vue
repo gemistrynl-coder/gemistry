@@ -1,36 +1,46 @@
 <template>
   <div class="page">
     <section id="services">
-      <!-- Loop door de categorieën (basic, deal, gold, enz.) -->
+      <!-- Loop per groep type -->
       <div
-          v-for="cat in groupedServices"
-          :key="cat.id"
-          class="category-block"
+          v-for="group in groupedServices"
+          :key="group.type"
+          class="type-group"
       >
-        <h3 class="category-title">{{ cat.naam }}</h3>
-        <div class="category-divider"></div>
+        <h2 class="group-title">{{ group.type.toUpperCase() }}</h2>
+        <div class="group-divider"></div>
 
-        <div class="services-grid">
-          <div
-              class="service-card"
-              :key="cat.id"
-              @click="openServicePopup(cat.items[0], cat)"
-          >
-            <div class="card-image">
-              <img :src="resolveImage(cat.image_url)" :alt="cat.naam" />
-            </div>
-            <div class="card-body">
-              <h3>{{ cat.naam }}</h3>
-              <p class="desc">{{ cat.tldr }}</p>
-              <p v-if="cat.items.length">
-                {{ cat.items.length }} opties beschikbaar
-              </p>
+        <!-- Loop de categorieën binnen die groep -->
+        <div
+            v-for="cat in group.categories"
+            :key="cat.id"
+            class="category-block"
+        >
+          <h3 class="category-title">{{ cat.naam }}</h3>
+          <div class="category-divider"></div>
+
+          <div class="services-grid">
+            <div
+                class="service-card"
+                :key="cat.id"
+                @click="openServicePopup(cat.items[0], cat)"
+            >
+              <div class="card-image">
+                <img :src="resolveImage(cat.image_url)" :alt="cat.naam" />
+              </div>
+              <div class="card-body">
+                <h3>{{ cat.naam }}</h3>
+                <p class="desc">{{ cat.tldr }}</p>
+                <p v-if="cat.items.length">
+                  {{ cat.items.length }} opties beschikbaar
+                </p>
+              </div>
             </div>
           </div>
         </div>
-
-    </div>
+      </div>
     </section>
+
 
     <!-- FOOTER -->
     <footer>
@@ -194,10 +204,20 @@ watch([showPopup, showCalendly], (states) => {
   }
 });
 
-// Groepering
 const groupedServices = computed(() => {
-  console.log("DEBUG: groupedServices.value =", services.value);
-  return services.value;
+  // Maak buckets per type
+  const buckets = {};
+  for (const cat of services.value) {
+    if (!buckets[cat.type]) {
+      buckets[cat.type] = {
+        type: cat.type,
+        categories: []
+      };
+    }
+    buckets[cat.type].categories.push(cat);
+  }
+  console.log("DEBUG: groupedServices grouped =", buckets);
+  return Object.values(buckets);
 });
 
 // Helpers
