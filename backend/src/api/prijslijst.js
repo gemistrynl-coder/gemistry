@@ -1,8 +1,37 @@
-// assets/api/prijslijst.js
 import express from "express";
+import cors from "cors";
 import mysql from "mysql2/promise";
 
-const router = express.Router();
+// ===============================
+// EXPRESS INIT
+// ===============================
+const app = express();
+const PORT = process.env.PORT || 8000;
+
+// ===============================
+// CORS CONFIG
+// ===============================
+const allowedOrigins = [
+    "http://localhost:5173",             // voor lokaal testen
+    "https://www.gemistrytoothgems.nl"   // productie frontend
+];
+
+app.use(
+    cors({
+        origin: function (origin, callback) {
+            // sta ook requests zonder origin toe (zoals curl/postman)
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true,
+    })
+);
+
+app.use(express.json());
 
 // ===============================
 // DB CONNECTIE (Railway via ENV)
@@ -33,8 +62,7 @@ function parseItems(row) {
 // ===============================
 // ENDPOINTS
 // ===============================
-
-router.get("/prijslijst", async (req, res) => {
+app.get("/api/prijslijst", async (req, res) => {
     try {
         const [rows] = await pool.query(
             "SELECT id, naam, description, tldr, prijs, type, image_url, items FROM prijslijst_categorie ORDER BY type, id"
@@ -73,31 +101,9 @@ router.get("/prijslijst", async (req, res) => {
     }
 });
 
-router.get("/prijslijst/:type", async (req, res) => {
-    try {
-        const type = req.params.type;
-        const [rows] = await pool.query(
-            "SELECT id, naam, description, tldr, prijs, type, image_url, items FROM prijslijst_categorie ORDER BY id"
-        );
-
-        const categories = [];
-        for (const row of rows) {
-            const items = parseItems(row).filter((i) => i.type === type);
-            if (items.length > 0) {
-                categories.push({
-                    ...row,
-                    naam: `${row.naam} (${type})`,
-                    type,
-                    items,
-                });
-            }
-        }
-
-        res.json(categories);
-    } catch (err) {
-        console.error("❌ Database error:", err);
-        res.status(500).json({ error: "Database error" });
-    }
+// ===============================
+// START SERVER
+// ===============================
+app.listen(PORT, () => {
+    console.log(`✅ Backend running on port ${PORT}`);
 });
-
-export default router;
