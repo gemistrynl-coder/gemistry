@@ -157,16 +157,19 @@ onMounted(async () => {
     const res = await fetch(`${API_BASE_URL}/api/prijslijst`);
     console.log("DEBUG: API response status =", res.status);
     const json = await res.json();
-    console.log("DEBUG: API response JSON =", JSON.stringify(json, null, 2));
+    console.log("DEBUG: API response JSON =", json);
 
+    // eerst API data laden
     services.value = json;
 
-    console.log("DEBUG: services.value na fetch =", services.value);
+
+
   } catch (err) {
     console.error("DEBUG: API fout =", err);
   }
-});
 
+  console.log("DEBUG: services.value na fetch+test =", services.value);
+});
 
 // Scroll lock helpers
 function lockScroll() {
@@ -191,11 +194,11 @@ watch([showPopup, showCalendly], (states) => {
   }
 });
 
+// Groepering
 const groupedServices = computed(() => {
-  console.log("DEBUG: groupedServices recompute =", services.value);
+  console.log("DEBUG: groupedServices.value =", services.value);
   return services.value;
 });
-
 
 // Helpers
 function formatPrice(price) {
@@ -208,7 +211,6 @@ function resolveImage(path) {
 
 // Popup functies
 function openServicePopup(item, cat) {
-  function openServicePopup(item, cat) {
     console.log("DEBUG: openServicePopup → cat =", cat);
     console.log("DEBUG: openServicePopup → item =", item);
 
