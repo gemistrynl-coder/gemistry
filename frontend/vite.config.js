@@ -4,7 +4,11 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
+// Detecteer automatisch of we in productie zijn
+const isProd = process.env.NODE_ENV === 'production'
+
 export default defineConfig({
+    base: isProd ? './' : '/', // ⬅️ relatieve paden in productie, absolute lokaal
     plugins: [vue(), vueDevTools()],
     resolve: {
         alias: {
