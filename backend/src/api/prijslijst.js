@@ -1,214 +1,105 @@
-// assets/api/index.js
+// assets/api/prijslijst.js
 import express from "express";
 import mysql from "mysql2/promise";
-import cors from "cors";
-import { google } from "googleapis";
+
+const router = express.Router();
 
 // ===============================
-// CONFIG
+// DB CONNECTIE (Railway via ENV)
 // ===============================
-const app = express();
-const PORT = process.env.PORT || 3001; // Railway geeft zelf een $PORT mee
-
-app.use(cors({
-    origin: ["https://www.gemistrytoothgems.nl", "http://192.168.178.50:3001"],
-    methods: ["GET", "POST"],
-    credentials: true
-}));
-
-// ===============================
-// DB CONNECTIE (Railway of lokaal)
-// ===============================
-let pool;
-
-if (process.env.RAILWAY_ENVIRONMENT) {
-    // 🚀 Railway
-    pool = mysql.createPool({
-        host: process.env.MYSQLHOST,
-        port: process.env.MYSQLPORT,
-        user: process.env.MYSQLUSER,
-        password: process.env.MYSQLPASSWORD,
-        database: process.env.MYSQL_DATABASE,
-        waitForConnections: true,
-        connectionLimit: 10,
-        queueLimit: 0
-    });
-} else {
-    // 💻 Lokaal → gebruik jouw connection string (uit Railway dashboard)
-    pool = mysql.createPool({
-        host: "centerbeam.proxy.rlwy.net",
-        port: 21767,
-        user: "root",
-        password: "XfruCWfQIGIIqazeuNyvwiNcTeTaddPW",
-        database: "railway",
-        waitForConnections: true,
-        connectionLimit: 10,
-        queueLimit: 0
-    });
-}
-
-// check connectie direct bij start
-(async () => {
-    const [rows] = await pool.query("SELECT NOW() as tijd");
-    console.log("✅ Verbonden met DB, tijd:", rows[0].tijd);
-})();
-
-// ===============================
-// GOOGLE DRIVE SETUP
-// ===============================
-const credentials = {
-    client_email: process.env.GOOGLE_CLIENT_EMAIL,
-    private_key: process.env.GOOGLE_PRIVATE_KEY,
-};
-
-const auth = new google.auth.GoogleAuth({
-    credentials,
-    scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+const pool = mysql.createPool({
+    host: process.env.MYSQLHOST,
+    port: process.env.MYSQLPORT,
+    user: process.env.MYSQLUSER,
+    password: process.env.MYSQLPASSWORD,
+    database: process.env.MYSQL_DATABASE,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
 });
 
-const drive = google.drive({ version: "v3", auth });
-
-// ID van jouw `blogpost` map (rechtsklik → "Link ophalen")
-const BLOGPOST_FOLDER_ID = "1Vo8uUqYxxSoUPrZrNKG77rcdOc67IVhd";
-
-// Helpers
-async function readFileContent(fileId) {
-    const res = await drive.files.get(
-        { fileId, alt: "media" },
-        { responseType: "text" }
-    );
-    return res.data;
-}
-
-async function downloadFileContent(fileId) {
-    const res = await drive.files.get(
-        { fileId, alt: "media" },
-        { responseType: "arraybuffer" } // raw binary
-    );
-    return Buffer.from(res.data).toString("base64");
-}
-
-async function listFilesInFolder(folderId) {
-    const res = await drive.files.list({
-        q: `'${folderId}' in parents and trashed = false`,
-        fields: "files(id, name, mimeType)"
-    });
-    return res.data.files;
+// ===============================
+// HELPERS
+// ===============================
+function parseItems(row) {
+    if (!row.items) return [];
+    try {
+        return JSON.parse(row.items);
+    } catch {
+        return [];
+    }
 }
 
 // ===============================
 // ENDPOINTS
 // ===============================
 
-// Logging middleware
-app.use((req, res, next) => {
-    console.log(`➡️ ${req.method} ${req.url}`);
-    next();
-});
-
-
-// ✅ Alle categorieën
-app.get("/api/prijslijst", async (req, res) => {
+// ✅ Alle categorieën + opgesplitst op type (basic/medium/etc.)
+router.get("/prijslijst", async (req, res) => {
     try {
         const [rows] = await pool.query(
-            "SELECT id, naam, description, tldr, prijs, type, image_url FROM prijslijst_categorie ORDER BY type, id"
+            "SELECT id, naam, description, tldr, prijs, type, image_url, items FROM prijslijst_categorie ORDER BY type, id"
         );
-        res.json(rows);
+
+        const categories = [];
+
+        for (const row of rows) {
+            const items = parseItems(row);
+            if (items.length > 0) {
+                const typesSeen = {};
+                for (const item of items) {
+                    const t = item.type;
+                    if (!typesSeen[t]) {
+                        const newCat = {
+                            ...row,
+                            id: `${row.id}-${t}`, // uniek id
+                            naam: `${row.naam} (${t})`,
+                            type: t,
+                            items: [],
+                        };
+                        typesSeen[t] = newCat;
+                        categories.push(newCat);
+                    }
+                    typesSeen[t].items.push(item);
+                }
+            } else {
+                categories.push({ ...row, items: [] });
+            }
+        }
+
+        res.json(categories);
     } catch (err) {
         console.error("❌ Database error:", err.message, err.stack);
-        res.json([]);
+        res.status(500).json({ error: "Database error" });
     }
 });
 
-// ✅ Per categorie type
-app.get("/api/prijslijst/:type", async (req, res) => {
+// ✅ Specifiek type ophalen
+router.get("/prijslijst/:type", async (req, res) => {
     try {
         const type = req.params.type;
         const [rows] = await pool.query(
-            "SELECT id, naam, description, tldr, prijs, type, image_url FROM prijslijst_categorie WHERE type = ? ORDER BY id",
-            [type]
+            "SELECT id, naam, description, tldr, prijs, type, image_url, items FROM prijslijst_categorie ORDER BY id"
         );
-        res.json(rows);
-    } catch (err) {
-        console.error("❌ Database error:", err);
-        res.status(500).json({ error: "Database error" });
-    }
-});
 
-// ✅ Alle items
-app.get("/api/prijslijst-items", async (req, res) => {
-    try {
-        const [rows] = await pool.query(
-            "SELECT id, categorie_id, naam, prijs FROM prijslijst_items ORDER BY categorie_id, id"
-        );
-        res.json(rows);
-    } catch (err) {
-        console.error("❌ Database error:", err);
-        res.status(500).json({ error: "Database error" });
-    }
-});
-
-// ✅ Items per categorie
-app.get("/api/prijslijst-items/:categorieId", async (req, res) => {
-    try {
-        const categorieId = req.params.categorieId;
-        const [rows] = await pool.query(
-            "SELECT id, categorie_id, naam, prijs FROM prijslijst_items WHERE categorie_id = ? ORDER BY id",
-            [categorieId]
-        );
-        res.json(rows);
-    } catch (err) {
-        console.error("❌ Database error:", err);
-        res.status(500).json({ error: "Database error" });
-    }
-});
-
-// ✅ Blogposts ophalen vanuit Google Drive (incl. alle JSON-velden + meerdere images)
-app.get("/api/blogposts", async (req, res) => {
-    try {
-        const blogFolders = await listFilesInFolder(BLOGPOST_FOLDER_ID);
-        const posts = [];
-
-        for (const folder of blogFolders) {
-            if (folder.mimeType !== "application/vnd.google-apps.folder") continue;
-
-            const files = await listFilesInFolder(folder.id);
-
-            const jsonFile = files.find(f => f.name.endsWith(".json"));
-            if (!jsonFile) continue;
-
-            // JSON inlezen
-            const jsonContent = await readFileContent(jsonFile.id);
-            const jsonData = JSON.parse(jsonContent);
-
-            // Alle afbeeldingen ophalen
-            const imgFiles = files.filter(f => f.mimeType && f.mimeType.startsWith("image/"));
-            const images = [];
-            for (const imgFile of imgFiles) {
-                const base64 = await downloadFileContent(imgFile.id);
-                images.push({
-                    mimeType: imgFile.mimeType,
-                    data: base64
+        const categories = [];
+        for (const row of rows) {
+            const items = parseItems(row).filter((i) => i.type === type);
+            if (items.length > 0) {
+                categories.push({
+                    ...row,
+                    naam: `${row.naam} (${type})`,
+                    type,
+                    items,
                 });
             }
-
-            // Voeg alles samen
-            posts.push({
-                ...jsonData, // alle velden uit JSON
-                images       // alle images in de map
-            });
         }
 
-        res.json(posts);
+        res.json(categories);
     } catch (err) {
-        console.error("❌ Fout bij ophalen blogposts:", err);
-        res.status(500).json({ error: "Kon blogposts niet ophalen" });
+        console.error("❌ Database error:", err);
+        res.status(500).json({ error: "Database error" });
     }
 });
 
-// ===============================
-// START
-// ===============================
-app.listen(PORT, () => {
-    console.log(`✅ API running on port ${PORT}`);
-});
+export default router;

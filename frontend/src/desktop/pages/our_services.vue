@@ -1,30 +1,31 @@
 <template>
   <div class="page">
     <section id="services">
-
       <!-- Loop door de categorieën (basic, deal, gold) -->
       <div
-          v-for="(items, type) in groupedServices"
-          :key="type"
+          v-for="cat in groupedServices"
+          :key="cat.id"
           class="category-block"
       >
-        <h3 class="category-title">{{ formatType(type) }}</h3>
+        <h3 class="category-title">{{ cat.naam }}</h3>
         <div class="category-divider"></div>
 
         <div class="services-grid">
           <div
               class="service-card"
-              v-for="item in items"
-              :key="item.id"
-              @click="openServicePopup(item)"
+              v-for="item in cat.items"
+              :key="item.naam"
+              @click="openServicePopup(cat)"
           >
             <div class="card-image">
-              <img :src="resolveImage(item.image_url)" :alt="item.naam" />
+              <img :src="resolveImage(cat.image_url)" :alt="cat.naam" />
             </div>
             <div class="card-body">
               <h3>{{ item.naam }}</h3>
-              <p class="price">€{{ formatPrice(item.prijs) }}</p>
-              <p class="desc">{{ item.tldr }}</p>
+              <p class="price">
+                {{ item.prijs ? `€${formatPrice(item.prijs)}` : "Prijs op aanvraag" }}
+              </p>
+              <p class="desc">{{ cat.tldr }}</p>
             </div>
           </div>
         </div>
@@ -88,11 +89,31 @@
         </div>
       </div>
     </div>
+
+    <!-- CALENDLY POPUP -->
+    <div
+        v-if="showCalendly"
+        class="gem-modal-overlay"
+        @click.self="closeCalendly"
+    >
+      <div class="service-modal" style="max-width:900px; width:95%; height:90vh;">
+        <button class="gem-close" @click="closeCalendly" aria-label="Sluiten">
+          ×
+        </button>
+        <div class="gem-header">
+          <div class="gem-divider"></div>
+        </div>
+        <div class="gem-body" style="flex-direction: column; height:100%;">
+          <!-- ✅ Hier injecteren we Calendly dynamisch -->
+          <div id="calendly-container" style="flex:1;"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch, nextTick } from "vue";
 
 // 🚀 Hardcoded API URL naar je Railway backend
 const API_BASE_URL = "https://gemistrybackend-production.up.railway.app";
@@ -101,6 +122,9 @@ const services = ref([]);
 const showPopup = ref(false);
 const selectedService = ref(null);
 const popupItems = ref([]);
+const showCalendly = ref(false);
+
+
 
 // Data ophalen
 onMounted(async () => {
@@ -109,6 +133,35 @@ onMounted(async () => {
     services.value = await res.json();
   } catch (err) {
     console.error("❌ API error:", err);
+  }
+
+  // ✅ Calendly script inladen
+  const script = document.createElement("script");
+  script.src = "https://assets.calendly.com/assets/external/widget.js";
+  script.async = true;
+  document.body.appendChild(script);
+});
+
+// Scroll lock helpers
+function lockScroll() {
+  const scrollBarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+  document.body.style.overflow = "hidden";
+  if (scrollBarWidth > 0) {
+    document.body.style.paddingRight = scrollBarWidth + "px";
+  }
+}
+function unlockScroll() {
+  document.body.style.overflow = "";
+  document.body.style.paddingRight = "";
+}
+
+// ✅ centraal scroll-lock voor beide popups
+watch([showPopup, showCalendly], (states) => {
+  if (states.some(Boolean)) {
+    lockScroll();
+  } else {
+    unlockScroll();
   }
 });
 
@@ -125,28 +178,21 @@ async function fetchItems(categorieId) {
   }
 }
 
-// Data groeperen per type
+
+// Geen groepering meer nodig → API geeft al gesplitste categories
 const groupedServices = computed(() => {
-  return services.value.reduce((groups, item) => {
-    if (!groups[item.type]) groups[item.type] = [];
-    groups[item.type].push(item);
-    return groups;
-  }, {});
+  return services.value; // lijst van categorieën
 });
+
 
 // Helpers
 function formatPrice(price) {
   return price ? parseFloat(price).toFixed(2).replace(".", ",") : "n.v.t.";
 }
-
 function resolveImage(path) {
   if (!path) return "../assets/img/placeholder.jpg";
-  // Strip "@/"" uit database values
   return path.replace(/^@\//, "/");
 }
-
-
-
 function formatType(type) {
   switch (type) {
     case "basic":
@@ -170,8 +216,27 @@ function closeServicePopup() {
   showPopup.value = false;
   popupItems.value = [];
 }
-</script>
 
+// ✅ Knop: sluit service popup, opent Calendly popup
+async function openBooking() {
+  closeServicePopup();
+  showCalendly.value = true;
+
+  await nextTick();
+
+  if (window.Calendly) {
+    window.Calendly.initInlineWidget({
+      url: "https://calendly.com/gemistrynl/1-gem?background_color=f2efe8&text_color=651a1a&primary_color=651a1a",
+      parentElement: document.getElementById("calendly-container"),
+      prefill: {},
+      utm: {},
+    });
+  }
+}
+function closeCalendly() {
+  showCalendly.value = false;
+}
+</script>
 
 <style scoped>
 .page {
@@ -222,26 +287,22 @@ function closeServicePopup() {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-
 .service-card:hover {
   transform: translateY(-8px);
   cursor: pointer;
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
-
 .card-image img {
   width: 100%;
   height: 200px;
   object-fit: cover;
 }
-
 .card-body {
   padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
-
 .service-card h3 {
   font-size: 24px;
   font-weight: bold;
@@ -249,13 +310,11 @@ function closeServicePopup() {
   text-transform: uppercase;
   margin: 0;
 }
-
 .price {
   font-size: 16px;
   font-weight: bold;
   color: #651a1a;
 }
-
 .desc {
   font-size: 17px;
   color: #444;
@@ -274,7 +333,6 @@ function closeServicePopup() {
   z-index: 9999;
   backdrop-filter: blur(4px);
 }
-
 .service-modal {
   background: #f2efe8;
   color: #651a1a;
@@ -288,7 +346,6 @@ function closeServicePopup() {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
   animation: fadeInUp 0.25s ease;
 }
-
 @keyframes fadeInUp {
   from {
     transform: translateY(20px);
@@ -299,7 +356,6 @@ function closeServicePopup() {
     opacity: 1;
   }
 }
-
 .gem-close {
   position: absolute;
   top: 15px;
@@ -320,7 +376,6 @@ function closeServicePopup() {
   background: #651a1a;
   color: #fff;
 }
-
 .gem-header {
   text-align: center;
   margin-bottom: 25px;
@@ -338,7 +393,6 @@ function closeServicePopup() {
   background: #651a1a;
   border-radius: 2px;
 }
-
 .gem-body {
   display: flex;
   flex-direction: row;
@@ -361,7 +415,6 @@ function closeServicePopup() {
   overflow-y: auto;
   padding-right: 6px;
 }
-
 .popup-price {
   font-weight: bold;
   font-size: 22px;
@@ -375,33 +428,19 @@ function closeServicePopup() {
   color: #555;
   margin-top: 4px;
 }
-
 .popup-right h4 {
   margin-top: 15px;
   font-size: 18px;
   text-decoration: underline;
 }
-
 .popup-right ul {
   margin: 0;
   padding-left: 18px;
 }
-
 .popup-right li {
   margin-bottom: 6px;
 }
 
-@media (max-width: 800px) {
-  .gem-body {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  .popup-right {
-    text-align: center;
-    padding-right: 0;
-  }
-}
 
 .cta-button {
   margin-top: 20px;
@@ -416,13 +455,11 @@ function closeServicePopup() {
   transition: all 0.25s ease;
   align-self: flex-start;
 }
-
 .cta-button:hover {
   background: #8a2a2a;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
-
 @media (max-width: 800px) {
   .cta-button {
     align-self: center;
@@ -430,7 +467,6 @@ function closeServicePopup() {
     max-width: 280px;
   }
 }
-
 /* ===== FOOTER ===== */
 #footer_legal {
   background-color: #651A1A;
@@ -438,5 +474,11 @@ function closeServicePopup() {
   text-align: center;
   padding: 20px;
   font-size: 14px;
+}
+
+#calendly-container{
+  width: 100%;
+  padding:0;
+  margin:0;
 }
 </style>

@@ -12,6 +12,7 @@
       </div>
 
       <!-- AFSPRAAK MAKEN -->
+      <!-- EXPLORE -->
       <div id="explore"><br>
         <p>Explore by catagory</p>
         <div>
@@ -29,8 +30,10 @@
             </div>
           </section>
         </div>
+
         <hr style=" width: 100%; padding: 0 10px 0 10px">
 
+        <!-- Why Gemistry sectie -->
         <div id="why_gemistry">
           <p id="why_gemistry_title">Why Gemistry?</p>
           <br>
@@ -41,46 +44,30 @@
           </p>
           <br><br>
           <hr style="border: 1px #F2EFE8 solid; width: 100%">
+        </div>
+      </div>
 
-          <!-- ✅ Dynamische blogposts -->
-          <div
-              v-for="(post, i) in blogPosts"
-              :key="i"
-              id="post"
-          >
-            <!-- alle afbeeldingen -->
-            <div v-if="post.images && post.images.length" class="post-images">
-              <img
-                  v-for="(img, j) in post.images"
-                  :key="j"
-                  :src="'data:' + img.mimeType + ';base64,' + img.data"
-                  alt="blog image"
-              />
-            </div>
+      <!-- ✅ Blog los eronder -->
+      <div class="blog-slider">
+        <button class="nav prev" @click="prevPost">‹</button>
 
-            <div id="post_text">
-              <!-- vaste velden -->
-              <p id="post_text_title">{{ post.title }}</p>
-              <p id="post_text_text">{{ post.text }}</p>
-              <small>{{ post.date }}</small>
+        <div class="post" v-for="(post, i) in visiblePosts" :key="i">
+          <!-- links afbeelding -->
+          <div class="post-image">
+            <img :src="post.image" alt="blog image" />
+          </div>
 
-              <!-- alle extra velden uit JSON -->
-              <div
-                  v-for="(value, key) in post"
-                  :key="key"
-                  v-if="!['title','text','date','images'].includes(key)"
-              >
-                <strong>{{ key }}:</strong> {{ value }}
-              </div>
-            </div>
+          <!-- rechts tekst -->
+          <div class="post-text">
+            <p class="post-title">{{ post.title }}</p>
+            <p class="post-body">{{ post.text }}</p>
+            <small>{{ post.date }}</small>
           </div>
         </div>
 
-
-
-
-        <br>
+        <button class="nav next" @click="nextPost">›</button>
       </div>
+
       <br><br>
 
       <div id="gemistry_family">
@@ -96,16 +83,50 @@
           <h3>Already following up?</h3>
           <div id="social_media_icons">
             <a href="https://www.instagram.com/gemistry.ams/" target="_blank">
-              <img src="@/desktop/assets/img/icons/insta_icon.png" alt="Instagram" />
+              <img src="../assets/img/icons/insta_icon.png" alt="Instagram" />
             </a>
             <a href="https://www.tiktok.com/@gemistry" target="_blank">
-              <img src="@/desktop/assets/img/icons/tiktok_icon.png" alt="TikTok" />
+              <img src="../assets/img/icons/tiktok_icon.png" alt="TikTok" />
             </a>
-            <a href="" id="contact">contact</a>
+          </div>
+
+          <!-- ✅ Contact blok direct eronder -->
+          <div id="contact_us">
+            <h2>Contact Us</h2>
+            <div class="contact-columns">
+
+              <!-- LEFT -->
+              <div class="contact-col">
+                <p><strong>Phone</strong><br>+31 658965703</p>
+                <p><strong>Email</strong><br>gemistrynl@gmail.com</p>
+                <p><strong>BTW-NUMMER</strong><br>NL005301771B83</p>
+                <p><strong>Didi Zeilstra</strong></p>
+              </div>
+
+              <!-- MIDDLE (foto) -->
+              <div class="contact-col">
+              </div>
+
+              <!-- RIGHT -->
+              <div class="contact-col">
+                <p><strong>Address</strong><br>Amsterdam Zuid</p>
+                <p><strong>BTW-NUMMER</strong><br>NL005301771B83</p>
+                <p><strong>Dean Davis</strong></p>
+              </div>
+
+            </div>
+
+            <p style="margin-top:20px;">
+              Voor samenwerkingen of meer informatie mail naar:
+              <a href="mailto:gemistrynl@gmail.com">gemistrynl@gmail.com</a>
+            </p>
           </div>
         </div>
+
         <div id="right"></div>
       </div>
+
+
 
       <div id="footer_legal">
         <p>Privacy policy | Algemene voorwaarden</p>
@@ -200,22 +221,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch } from "vue";
+import { ref, onMounted, onBeforeUnmount, watch, computed } from "vue";
 
-// ==============================
-// BLOGPOSTS DYNAMISCH LADEN
-// ==============================
-const blogPosts = ref<any[]>([]);
 
-onMounted(async () => {
-  try {
-    // 👉 Backend moet JSON + image teruggeven uit je blog-shoot folders
-    const res = await fetch(`${API_BASE_URL}/api/blogposts`);
-    blogPosts.value = await res.json();
-  } catch (err) {
-    console.error("❌ Blogposts ophalen mislukt:", err);
-  }
-});
 
 // ==============================
 // DATE PICKER
@@ -398,6 +406,47 @@ const handleCardClick = (item: GalleryItem) => {
     // TODO: events-popup
   }
 };
+
+
+
+// ✅ Hard-coded blogposts
+const blogPosts = ref([
+  {
+    title: "OUR LATEST SHOOT IN AMSTERDAM ZUID",
+    text: "Behind the scenes at our very first Gemistry shoot. Together with our models we captured the energy, style and creativity that define Gemistry. We placed Swarovski gems on each model and every look tells its own story.",
+    date: "Oct 2025",
+    image: new URL("@/desktop/assets/img/blog_img/img.png", import.meta.url).href,
+  },
+  // {
+  //   title: "SHOOT IN ROTTERDAM",
+  //   text: "Another amazing shoot in Rotterdam. Creative vibes, good energy and the community is growing.",
+  //   date: "Sept 2025",
+  //   image: new URL("@/desktop/assets/img/random_image/image1.jpeg", import.meta.url).href,
+  // },
+  // {
+  //   title: "FESTIVAL VIBES",
+  //   text: "Gemistry joined a summer festival – spreading smiles and shiny vibes all around.",
+  //   date: "Aug 2025",
+  //   image: new URL("@/desktop/assets/img/random_image/IMG_6667.jpg", import.meta.url).href,
+  // },
+]);
+
+// ✅ slider state
+const currentIndex = ref(0);
+
+// toon 1 tegelijk (kan je uitbreiden naar 2 of 3)
+const visiblePosts = computed(() => {
+  return [blogPosts.value[currentIndex.value]];
+});
+
+// navigatie
+function nextPost() {
+  currentIndex.value = (currentIndex.value + 1) % blogPosts.value.length;
+}
+function prevPost() {
+  currentIndex.value =
+      (currentIndex.value - 1 + blogPosts.value.length) % blogPosts.value.length;
+}
 </script>
 
 
@@ -950,7 +999,94 @@ footer {
 }
 
 
+#contact_us {
+  padding: 20px;
+  text-align: center;
+}
+
+#contact_us h2 {
+  margin: 30px 0 20px 0;
+}
+
+.contact-columns {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap; /* ✅ mobiel breekt alles netjes */
+  margin-bottom: 20px;
+}
+
+.contact-col {
+  flex: 1;
+  min-width: 200px;
+}
 
 
+.blog-slider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  margin-top: 40px;
+}
+
+.post {
+  display: flex;
+  background: #f2efe8;
+  width: 900px;
+  height: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.post-image {
+  flex: 0 0 50%;          /* neemt links de helft */
+  height: 100%;           /* zelfde hoogte als tekst */
+  overflow: hidden;
+}
+
+.post-image img {
+  width: 100%;            /* vult hele helft */
+  height: 100%;
+  object-fit: cover;      /* foto netjes bijgesneden */
+  display: block;
+}
+
+
+.post-text {
+  flex: 1;               /* neemt de rest van de ruimte */
+  padding: 20px!important;
+  text-align: left;
+  font-size: 8px!important;
+  color: #333!important;
+}
+
+
+.post-title {
+  font-size: 39px!important;
+  font-weight: bold;
+  color: #000!important;
+}
+
+.post-body {
+  font-size: 18px;
+  color: #333;
+  margin: 15px 0;
+}
+
+.nav {
+  background: #651a1a;
+  color: white;
+  border: none;
+  font-size: 32px;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  transition: 0.2s;
+}
+.nav:hover {
+  background: #8a2a2a;
+}
 
 </style>
