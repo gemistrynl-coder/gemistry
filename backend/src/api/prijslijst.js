@@ -54,26 +54,18 @@ const pool = mysql.createPool({
 app.get("/api/prijslijst", async (req, res) => {
     try {
         const [rows] = await pool.query(
-            "SELECT id, naam, description, tldr, prijs, type, image_url, items FROM prijslijst_categorie ORDER BY type, id"
+            "SELECT id, naam, description, tldr, prijs, type, image_url, items, aanbetaling FROM prijslijst_categorie ORDER BY type, id"
         );
 
         const categories = rows.map(row => {
             let parsedItems = [];
-
             if (row.items) {
                 try {
-                    // ✅ Check of het al object/array is
-                    if (typeof row.items === "string") {
-                        parsedItems = JSON.parse(row.items);
-                    } else {
-                        parsedItems = row.items; // MySQL JSON → object/array
-                    }
-                } catch (err) {
-                    console.error("❌ Fout bij parsen items:", err);
+                    parsedItems = typeof row.items === "string" ? JSON.parse(row.items) : row.items;
+                } catch {
                     parsedItems = [];
                 }
             }
-
             return { ...row, items: parsedItems };
         });
 

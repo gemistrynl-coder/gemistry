@@ -18,7 +18,13 @@
               <p v-if="Array.isArray(cat.items) && cat.items.length">
                 {{ cat.items.length }} opties beschikbaar
               </p>
+
+              <!-- ✅ nieuwe regel voor aanbetaling -->
+              <p v-if="cat.aanbetaling" class="deposit">
+                Aanbetaling: €{{ formatPrice(cat.aanbetaling) }}
+              </p>
             </div>
+
           </div>
         </div>
       </div>
@@ -361,4 +367,12 @@ function resolveImage(path) {
 /* FOOTER */
 #footer_legal { background-color: #651A1A; color: #fff; text-align: center; padding: 20px; font-size: 14px; }
 #calendly-container { width: 100%; padding: 0; margin: 0; }
+
+.deposit {
+  font-style: italic;
+  color: #777;
+  font-size: 0.9em;
+  margin-top: 6px;
+}
+
 </style>
