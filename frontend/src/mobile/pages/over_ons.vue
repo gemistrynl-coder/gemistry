@@ -11,7 +11,7 @@
                 <p>OPRICHTER</p>
               </div>
               <div>
-                <h3>Dean Davis</h3>
+                <h3>Dean Davies</h3>
                 <p>OPRICHTER</p>
               </div>
             </div>

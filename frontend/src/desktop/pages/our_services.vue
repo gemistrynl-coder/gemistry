@@ -2,7 +2,7 @@
   <div class="page">
     <section id="services">
       <div v-for="group in groupedServices" :key="group.type" class="group-block">
-        <h2 class="group-title">{{ group.type.toUpperCase() }}</h2>
+        <h1 class="group-title">{{ group.type.toUpperCase() }}</h1>
         <div class="category-divider"></div>
 
         <!-- grid met alle categories van dit type -->
@@ -374,5 +374,16 @@ function resolveImage(path) {
   font-size: 0.9em;
   margin-top: 6px;
 }
+
+
+.group-title{
+  font-size: 28px;
+  font-weight: bold;
+  color: #651a1a;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: "Vogue", Georgia, serif;
+}
+
 
 </style>

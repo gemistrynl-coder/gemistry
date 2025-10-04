@@ -7,7 +7,7 @@
       <div id="main_image">
         <div id="main_image_div">
           <p id="image_title">Your smile, your color,<br> your vibe.</p>
-          <button @click="openAppointmentPopup">MAAK EEN AFSPRAAK</button>
+          <a href="/services"><button class="gem-cta">MAAK EEN AFSPRAAK</button></a>
         </div>
       </div>
 
@@ -61,7 +61,7 @@
           <div class="post-text">
             <p class="post-title">{{ post.title }}</p>
             <p class="post-body">{{ post.text }}</p>
-            <small>{{ post.date }}</small>
+            <small style="font-size: 11px;">{{ post.date }}</small>
           </div>
         </div>
 
@@ -111,14 +111,14 @@
               <div class="contact-col">
                 <p><strong>Address</strong><br>Amsterdam Zuid</p>
                 <p><strong>BTW-NUMMER</strong><br>NL005301771B83</p>
-                <p><strong>Dean Davis</strong></p>
+                <p><strong>Dean Davies</strong></p>
               </div>
 
             </div>
 
             <p style="margin-top:20px;">
               Voor samenwerkingen of meer informatie mail naar:
-              <a href="mailto:gemistrynl@gmail.com">gemistrynl@gmail.com</a>
+              <b><a href="mailto:gemistrynl@gmail.com" style="text-decoration: none; color: #651A1A;">gemistrynl@gmail.com</a></b>
             </p>
           </div>
         </div>
@@ -147,7 +147,7 @@
             <p>Onze klanten en modellen zijn het hart van ons merk...</p>
             <p>We zijn continu op zoek naar mensen die ons merk willen vertegenwoordigen...</p>
             <p class="gem-cta-wrap">
-              <button class="gem-cta" @click="closeGemPopup">MAAK EEN AFSPRAAK</button>
+              <a href="/services"><button class="gem-cta">MAAK EEN AFSPRAAK</button></a>
             </p>
           </div>
           <div class="gem-image-wrap">

@@ -4,10 +4,8 @@
       <nav>
         <a href="/">Home</a>
         <a href="/over_ons">Over ons</a>
-        <a href="/services">Services</a>
         <h3>. GEMISTRY .</h3>
-        <a href="/contact">Contact</a>
-        <a href="/prijslijst">Afspraak maken</a>
+        <a href="/services">Services</a>
         <a href=""></a>
       </nav>
     </header>

@@ -95,7 +95,7 @@
 
               <div class="contact-col">
                 <p><strong>Address</strong><br />Amsterdam Zuid</p>
-                <p><strong>Dean Davis</strong></p>
+                <p><strong>Dean Davies</strong></p>
               </div>
             </div>
 
