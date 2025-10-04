@@ -1,42 +1,41 @@
 <template>
   <div class="page">
     <main class="content">
-      <!-- Intro -->
       <section id="over_ons">
-        <div class="intro">
-          <div class="founders">
-            <div class="names">
-              <div>
-                <h3>Didi Zeilstra</h3>
-                <p>OPRICHTER</p>
-              </div>
-              <div>
-                <h3>Dean Davies</h3>
-                <p>OPRICHTER</p>
-              </div>
-            </div>
-            <img src="@/mobile/assets/img/ons/didi_dean.jpg" alt="Didi en Dean" />
-          </div>
 
-          <div class="intro-text">
-            <p>
-              Wij zijn Didi en Dean, de gezichten achter Gemistry. Wat begon als een gedeelde passie
-              voor creativiteit en zelfexpressie, groeide uit tot een eigen concept: toothgems die verder
-              gaan dan alleen een accessoire. Samen combineren we onze energie, ideeën en skills om iets
-              unieks neer te zetten. Voor ons draait het niet alleen om tanden laten stralen, maar ook om
-              mensen meer zelfvertrouwen en plezier mee te geven.
-            </p>
-            <p>
-              Didi is heel creatief en voor haar is niks te gek. Terwijl Dean graag klanten zelfverzekerder
-              laat voelen. Deze combinatie zorgt voor een veilige en leuke plek om jezelf even iets extra’s
-              te gunnen.
-            </p>
+        <!-- 👇 aparte sectie voor founders -->
+        <div class="founders slide-in-left">
+          <div class="names">
+            <div>
+              <h3>Didi Zeilstra</h3>
+              <p>OPRICHTER</p>
+            </div>
+            <div>
+              <h3>Dean Davies</h3>
+              <p>OPRICHTER</p>
+            </div>
           </div>
+          <img src="@/mobile/assets/img/ons/didi_dean.jpg" alt="Didi en Dean" />
         </div>
 
-        <!-- Verhaal -->
+        <!-- 👇 intro-text los daarna -->
+        <div class="intro-text slide-in-right">
+          <p>
+            Wij zijn Didi en Dean, de gezichten achter Gemistry. Wat begon als een gedeelde passie
+            voor creativiteit en zelfexpressie, groeide uit tot een eigen concept: toothgems die verder
+            gaan dan alleen een accessoire. Samen combineren we onze energie, ideeën en skills om iets
+            unieks neer te zetten.
+          </p>
+          <p>
+            Didi is heel creatief en voor haar is niks te gek. Terwijl Dean graag klanten zelfverzekerder
+            laat voelen. Deze combinatie zorgt voor een veilige en leuke plek om jezelf iets extra’s
+            te gunnen.
+          </p>
+        </div>
+
+        <!-- Story -->
         <div class="story-container">
-          <div class="story">
+          <div class="story slide-in-left">
             <p>
               Bij Gemistry draait alles om jouw glimlach. Wij zijn gespecialiseerd in het zetten van
               Swarovski toothgems en unieke designs die passen bij jouw stijl. Kwaliteit en hygiëne staan bij
@@ -53,18 +52,18 @@
             <p><b>Your smile, your color, your vibe.</b></p>
           </div>
 
-          <div class="story-images">
+          <div class="story-images slide-in-right">
             <img src="@/mobile/assets/img/ons/krant.jpg" alt="Krant" />
             <img src="@/mobile/assets/img/ons/gems.jpg" alt="Gems" />
           </div>
         </div>
 
-        <!-- Producten -->
+        <!-- Products -->
         <div id="products">
-          <h2>The products we use</h2>
-          <hr />
+          <h2 class="slide-in-up">The products we use</h2>
+          <hr class="slide-in-up" />
           <div class="product-grid">
-            <div class="product-card">
+            <div class="product-card slide-in-left">
               <h3 class="product-title">REAL SWAROVSKI</h3>
               <div class="product-body">
                 <p>
@@ -73,7 +72,7 @@
                 </p>
               </div>
             </div>
-            <div class="product-card">
+            <div class="product-card slide-in-up">
               <h3 class="product-title">18 KARAAT GOUD</h3>
               <div class="product-body">
                 <p>
@@ -82,7 +81,7 @@
                 </p>
               </div>
             </div>
-            <div class="product-card">
+            <div class="product-card slide-in-right">
               <h3 class="product-title">HYGIENE</h3>
               <div class="product-body">
                 <p>
@@ -96,7 +95,7 @@
       </section>
     </main>
 
-    <!-- FOOTER -->
+    <!-- Footer -->
     <footer>
       <div id="footer_legal">
         <p>Privacy policy | Algemene voorwaarden</p>
@@ -106,54 +105,97 @@
   </div>
 </template>
 
-<script setup lang="ts">
-// geen speciale scripts hier nodig
+<script setup>
+import { onMounted } from "vue"
+
+onMounted(() => {
+  const elements = document.querySelectorAll(".slide-in-left, .slide-in-right, .slide-in-up")
+
+  const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible")
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.25 }
+  )
+
+  elements.forEach((el) => observer.observe(el))
+})
 </script>
 
 <style scoped>
 .page {
   width: 100%;
-  min-height: 100vh;
-  margin: auto;
-  background-color: #F2EFE8;
+  background-color: #f2efe8;
   display: flex;
   flex-direction: column;
 }
 
-/* Intro */
-.intro {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 20px;
+/* --- SLIDE-IN EFFECTEN --- */
+.slide-in-left,
+.slide-in-right,
+.slide-in-up {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
 }
 
+.slide-in-left {
+  transform: translateX(-120px) scale(0.95);
+}
+.slide-in-left.visible {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
+.slide-in-right {
+  transform: translateX(120px) scale(0.95);
+}
+.slide-in-right.visible {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
+.slide-in-up {
+  transform: translateY(120px) scale(0.95);
+}
+.slide-in-up.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* --- CONTENT STYLING --- */
 .founders {
   display: flex;
   flex-direction: column;
-  gap: 10px;
   text-align: center;
+  padding: 20px;
 }
 
 .founders .names {
   display: flex;
   justify-content: space-around;
-  gap: 10px;
 }
 
 .founders img {
   width: 100%;
   border-radius: 6px;
   object-fit: cover;
+  margin-top: 10px;
 }
 
 .intro-text {
-  font-size: 20px;
+  padding: 20px;
+  font-size: 18px;
   line-height: 1.5;
   color: #651a1a;
 }
 
-/* Verhaal */
 .story-container {
   display: flex;
   flex-direction: column;
@@ -162,45 +204,38 @@
 }
 
 .story {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.6;
   color: #651a1a;
-}
-
-.story-images {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 .story-images img {
   width: 100%;
   border-radius: 6px;
-  object-fit: cover;
+  margin-top: 10px;
 }
 
-/* Products */
 #products {
-  margin-top: 20px;
+  margin-top: 40px;
   text-align: center;
   padding: 20px;
 }
 
 #products h2 {
   font-size: 20px;
-  margin-bottom: 15px;
   color: #651a1a;
 }
 
 #products hr {
-  border: 1px solid #651A1A;
-  margin-bottom: 20px;
+  border: 1px solid #651a1a;
+  margin: 10px auto 20px;
+  width: 80%;
 }
 
 .product-grid {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
 }
 
 .product-card {
@@ -224,13 +259,10 @@
   text-align: left;
 }
 
-/* Footer */
-footer {
-  margin-top: 40px;
-}
-
+/* FOOTER */
 #footer_legal {
-  background-color: #651A1A;
+  margin-top: 50px;
+  background-color: #651a1a;
   color: white;
   text-align: center;
   padding: 15px;
