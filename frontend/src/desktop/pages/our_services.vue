@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <section id="services">
-      <!-- Loop door de categorieën (basic, deal, gold) -->
+      <!-- Loop door de categorieën (basic, deal, gold, enz.) -->
       <div
           v-for="cat in groupedServices"
           :key="cat.id"
@@ -15,127 +15,126 @@
               class="service-card"
               v-for="item in cat.items"
               :key="item.naam"
+              @click="openServicePopup(cat)"   <!-- ✅ klik opent popup -->
           >
-            <div class="card-image">
-              <img :src="resolveImage(cat.image_url)" :alt="cat.naam" />
-            </div>
-            <div class="card-body">
-              <h3>{{ item.naam }}</h3>
-              <p class="price">
-                {{ item.prijs ? `€${formatPrice(item.prijs)}` : "Prijs op aanvraag" }}
-                ({{ item.duration }}, type: {{ item.type }})
-              </p>
-              <p class="desc">{{ cat.tldr }}</p>
+          <div class="card-image">
+            <img :src="resolveImage(cat.image_url)" :alt="cat.naam" />
+          </div>
+          <div class="card-body">
+            <h3>{{ item.naam }}</h3>
+            <p class="price">
+              {{ item.prijs ? `€${formatPrice(item.prijs)}` : "Prijs op aanvraag" }}
+              ({{ item.duration }}, type: {{ item.type }})
+            </p>
+            <p class="desc">{{ cat.tldr }}</p>
+          </div>
+        </div>
+      </div>
+  </div>
+  </section>
 
-              <!-- ✅ Knop met URL uit database -->
-              <a
-                  class="cta-button"
-                  :href="item.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
+  <!-- FOOTER -->
+  <footer>
+    <div id="footer_legal">
+      <p>Privacy policy | Algemene voorwaarden</p>
+      <p>© 2025 Gemistry. Alle rechten voorbehouden.</p>
+    </div>
+  </footer>
+
+  <!-- SERVICE POPUP -->
+  <div
+      v-if="showPopup"
+      class="gem-modal-overlay"
+      @click.self="closeServicePopup"
+  >
+    <div class="service-modal">
+      <!-- Close -->
+      <button class="gem-close" @click="closeServicePopup" aria-label="Sluiten">
+        ×
+      </button>
+
+      <!-- Header -->
+      <div class="gem-header">
+        <h2>{{ selectedService?.naam }}</h2>
+        <div class="gem-divider"></div>
+      </div>
+
+      <!-- Body -->
+      <div class="gem-body">
+        <div class="popup-left">
+          <img
+              :src="resolveImage(selectedService?.image_url)"
+              :alt="selectedService?.naam"
+          />
+        </div>
+        <div class="popup-right">
+          <p class="popup-price" v-if="selectedService?.prijs">
+            €{{ formatPrice(selectedService?.prijs) }}
+          </p>
+          <p>{{ selectedService?.description }}</p>
+          <p class="popup-tldr">{{ selectedService?.tldr }}</p>
+
+          <!-- ✅ Alle afspraken-items -->
+          <div v-if="selectedService?.items?.length">
+            <h4>Afspraken</h4>
+            <ul>
+              <li
+                  v-for="it in selectedService.items"
+                  :key="it.naam"
+                  style="margin-bottom: 10px"
               >
-                Maak afspraak
-              </a>
-            </div>
-          </div>
+                {{ it.naam }} —
+                <span v-if="it.prijs">€{{ formatPrice(it.prijs) }}</span>
+                <span v-else>Prijs op aanvraag</span>
+                ({{ it.duration }})
 
-        </div>
-      </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer>
-      <div id="footer_legal">
-        <p>Privacy policy | Algemene voorwaarden</p>
-        <p>© 2025 Gemistry. Alle rechten voorbehouden.</p>
-      </div>
-    </footer>
-
-    <!-- SERVICE POPUP -->
-    <div
-        v-if="showPopup"
-        class="gem-modal-overlay"
-        @click.self="closeServicePopup"
-    >
-      <div class="service-modal">
-        <!-- Close -->
-        <button class="gem-close" @click="closeServicePopup" aria-label="Sluiten">
-          ×
-        </button>
-
-        <!-- Header -->
-        <div class="gem-header">
-          <h2>{{ selectedService?.naam }}</h2>
-          <div class="gem-divider"></div>
-        </div>
-
-        <!-- Body -->
-        <div class="gem-body">
-          <div class="popup-left">
-            <img
-                :src="resolveImage(selectedService?.image_url)"
-                :alt="selectedService?.naam"
-            />
-          </div>
-          <div class="popup-right">
-            <p class="popup-price">€{{ formatPrice(selectedService?.prijs) }}</p>
-            <p>{{ selectedService?.description }}</p>
-            <p class="popup-tldr">{{ selectedService?.tldr }}</p>
-
-            <!-- ✅ Items -->
-            <div v-if="popupItems.length">
-              <h4>Items</h4>
-              <ul>
-                <li v-for="it in popupItems" :key="it.id">
-                  {{ it.naam }} - €{{ formatPrice(it.prijs) }}
-                </li>
-              </ul>
-            </div>
-
-            <!-- ✅ Nieuwe knop -->
-            <button class="cta-button" @click="openBooking">
-              Maak nu een afspraak
-            </button>
+                <!-- ✅ knop naar juiste URL -->
+                <a
+                    class="cta-button"
+                    :href="it.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                  Maak afspraak
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- CALENDLY POPUP -->
-    <div
-        v-if="showCalendly"
-        class="gem-modal-overlay"
-        @click.self="closeCalendly"
-    >
-      <div class="service-modal" style="max-width:900px; width:95%; height:90vh;">
-        <button class="gem-close" @click="closeCalendly" aria-label="Sluiten">
-          ×
-        </button>
-        <div class="gem-header">
-          <div class="gem-divider"></div>
-        </div>
-        <div class="gem-body" style="flex-direction: column; height:100%;">
-          <!-- ✅ Hier injecteren we Calendly dynamisch -->
-          <div id="calendly-container" style="flex:1;"></div>
-        </div>
+  <!-- CALENDLY POPUP (optioneel, nu direct via links) -->
+  <div
+      v-if="showCalendly"
+      class="gem-modal-overlay"
+      @click.self="closeCalendly"
+  >
+    <div class="service-modal" style="max-width:900px; width:95%; height:90vh;">
+      <button class="gem-close" @click="closeCalendly" aria-label="Sluiten">
+        ×
+      </button>
+      <div class="gem-header">
+        <div class="gem-divider"></div>
+      </div>
+      <div class="gem-body" style="flex-direction: column; height:100%;">
+        <div id="calendly-container" style="flex:1;"></div>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, watch, nextTick } from "vue";
 
-// 🚀 Hardcoded API URL naar je Railway backend
 const API_BASE_URL = "https://gemistrybackend-production.up.railway.app";
 
 const services = ref([]);
 const showPopup = ref(false);
 const selectedService = ref(null);
-const popupItems = ref([]);
 const showCalendly = ref(false);
-
-
 
 // Data ophalen
 onMounted(async () => {
@@ -146,14 +145,14 @@ onMounted(async () => {
     console.error("❌ API error:", err);
   }
 
-  // ✅ Calendly script inladen
+  // Calendly script inladen
   const script = document.createElement("script");
   script.src = "https://assets.calendly.com/assets/external/widget.js";
   script.async = true;
   document.body.appendChild(script);
 });
 
-// Scroll lock helpers
+// Scroll lock
 function lockScroll() {
   const scrollBarWidth =
       window.innerWidth - document.documentElement.clientWidth;
@@ -166,8 +165,6 @@ function unlockScroll() {
   document.body.style.overflow = "";
   document.body.style.paddingRight = "";
 }
-
-// ✅ centraal scroll-lock voor beide popups
 watch([showPopup, showCalendly], (states) => {
   if (states.some(Boolean)) {
     lockScroll();
@@ -176,25 +173,10 @@ watch([showPopup, showCalendly], (states) => {
   }
 });
 
-// Items ophalen per categorie_id
-async function fetchItems(categorieId) {
-  try {
-    const res = await fetch(
-        `${API_BASE_URL}/api/prijslijst-items/${categorieId}`
-    );
-    return await res.json();
-  } catch (err) {
-    console.error("❌ API error:", err);
-    return [];
-  }
-}
-
-
-// Geen groepering meer nodig → API geeft al gesplitste categories
+// Groepering
 const groupedServices = computed(() => {
-  return services.value; // lijst van categorieën
+  return services.value;
 });
-
 
 // Helpers
 function formatPrice(price) {
@@ -204,32 +186,19 @@ function resolveImage(path) {
   if (!path) return "../assets/img/placeholder.jpg";
   return path.replace(/^@\//, "/");
 }
-function formatType(type) {
-  switch (type) {
-    case "basic":
-      return "Basic Services";
-    case "deal":
-      return "Deals";
-    case "gold":
-      return "Gold Collection";
-    default:
-      return type;
-  }
-}
 
 // Popup
-async function openServicePopup(item) {
-  selectedService.value = item;
+function openServicePopup(cat) {
+  selectedService.value = cat;
   showPopup.value = true;
-  popupItems.value = await fetchItems(item.id);
 }
 function closeServicePopup() {
   showPopup.value = false;
-  popupItems.value = [];
+  selectedService.value = null;
 }
 
-// ✅ Knop: sluit service popup, opent Calendly popup
-async function openBooking() {
+// Calendly popup (optioneel)
+async function openBooking(url) {
   closeServicePopup();
   showCalendly.value = true;
 
@@ -237,7 +206,7 @@ async function openBooking() {
 
   if (window.Calendly) {
     window.Calendly.initInlineWidget({
-      url: "https://calendly.com/gemistrynl/1-gem?background_color=f2efe8&text_color=651a1a&primary_color=651a1a",
+      url,
       parentElement: document.getElementById("calendly-container"),
       prefill: {},
       utm: {},
@@ -248,6 +217,7 @@ function closeCalendly() {
   showCalendly.value = false;
 }
 </script>
+
 
 <style scoped>
 .page {
