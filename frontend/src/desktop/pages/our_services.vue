@@ -15,7 +15,6 @@
               class="service-card"
               v-for="item in cat.items"
               :key="item.naam"
-              @click="openServicePopup(cat)"
           >
             <div class="card-image">
               <img :src="resolveImage(cat.image_url)" :alt="cat.naam" />
@@ -24,10 +23,22 @@
               <h3>{{ item.naam }}</h3>
               <p class="price">
                 {{ item.prijs ? `€${formatPrice(item.prijs)}` : "Prijs op aanvraag" }}
+                ({{ item.duration }}, type: {{ item.type }})
               </p>
               <p class="desc">{{ cat.tldr }}</p>
+
+              <!-- ✅ Knop met URL uit database -->
+              <a
+                  class="cta-button"
+                  :href="item.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+              >
+                Maak afspraak
+              </a>
             </div>
           </div>
+
         </div>
       </div>
     </section>
