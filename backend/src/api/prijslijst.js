@@ -54,7 +54,7 @@ const pool = mysql.createPool({
 app.get("/api/prijslijst", async (req, res) => {
     try {
         const [rows] = await pool.query(
-            "SELECT id, naam, description, tldr, prijs, type, image_url, items, aanbetaling FROM prijslijst_categorie ORDER BY type, id"
+            "SELECT id, naam, description, tldr, prijs, type, image_url, items, aanbetaling FROM prijslijst_categorie ORDER BY prijs, type, id"
         );
 
         const categories = rows.map(row => {

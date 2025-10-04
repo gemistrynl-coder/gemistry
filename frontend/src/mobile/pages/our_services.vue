@@ -1,30 +1,32 @@
 <template>
   <div class="page">
     <section id="services">
-
       <!-- Loop door de categorieën (basic, deal, gold) -->
-      <div
-          v-for="(items, type) in groupedServices"
-          :key="type"
-          class="category-block"
-      >
-        <h3 class="category-title">{{ formatType(type) }}</h3>
+      <div v-for="group in groupedServices" :key="group.type" class="category-block">
+        <h3 class="category-title">{{ formatType(group.type) }}</h3>
         <div class="category-divider"></div>
 
+        <!-- grid met alle categories van dit type -->
         <div class="services-grid">
           <div
               class="service-card"
-              v-for="item in items"
-              :key="item.id"
-              @click="openServicePopup(item)"
+              v-for="cat in group.categories"
+              :key="cat.id"
+              @click="openServicePopup(cat.items?.[0], cat)"
           >
             <div class="card-image">
-              <img :src="resolveImage(item.image_url)" :alt="item.naam" />
+              <img :src="resolveImage(cat.image_url)" :alt="cat.naam" />
             </div>
             <div class="card-body">
-              <h3>{{ item.naam }}</h3>
-              <p class="price">€{{ formatPrice(item.prijs) }}</p>
-              <p class="desc">{{ item.tldr }}</p>
+              <h3>{{ cat.naam }}</h3>
+              <p class="desc">{{ cat.tldr }}</p>
+              <p v-if="Array.isArray(cat.items) && cat.items.length">
+                {{ cat.items.length }} opties beschikbaar
+              </p>
+              <!-- ✅ Aanbetaling -->
+              <p v-if="cat.aanbetaling" class="deposit">
+                Aanbetaling: €{{ formatPrice(cat.aanbetaling) }}
+              </p>
             </div>
           </div>
         </div>
@@ -54,135 +56,179 @@
               <img :src="resolveImage(selectedService?.image_url)" :alt="selectedService?.naam" />
             </div>
             <div class="popup-right">
-              <p class="popup-price">€{{ formatPrice(selectedService?.prijs) }}</p>
-              <p>{{ selectedService?.description }}</p>
-              <p class="popup-tldr">{{ selectedService?.tldr }}</p>
+              <p class="popup-tldr">{{ selectedService?.description }}</p>
 
-              <div v-if="popupItems.length">
-                <h4>Items</h4>
-                <ul>
-                  <li v-for="it in popupItems" :key="it.id">
-                    {{ it.naam }} - €{{ formatPrice(it.prijs) }}
-                  </li>
-                </ul>
+              <div v-if="selectedService && hasAnyPopupItems">
+                <h4>Afspraken</h4>
+                <template v-if="Object.keys(popupGroupedItems).length">
+                  <div v-for="(items, t) in popupGroupedItems" :key="t" class="type-block">
+                    <h5>Type: {{ t }}</h5>
+                    <ul>
+                      <li
+                          v-for="(it, idx) in items"
+                          :key="`${it.naam}-${idx}`"
+                          style="margin-bottom:10px"
+                      >
+                        {{ it.naam }} —
+                        <span v-if="hasPrijs(it.prijs)">€{{ formatPrice(it.prijs) }}</span>
+                        <span v-else>Prijs op aanvraag</span>
+                        ({{ it.duration }})
+                        <a
+                            class="cta-button"
+                            :href="it.url"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                          Maak afspraak
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </template>
+
+                <template v-else>
+                  <ul>
+                    <li
+                        v-for="(it, idx) in popupItems"
+                        :key="`${it.naam}-${idx}`"
+                        style="margin-bottom:10px"
+                    >
+                      {{ it.naam }} —
+                      <span v-if="hasPrijs(it.prijs)">€{{ formatPrice(it.prijs) }}</span>
+                      <span v-else>Prijs op aanvraag</span>
+                      ({{ it.duration }})
+                      <a
+                          class="cta-button"
+                          :href="it.url"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                      >
+                        Maak afspraak
+                      </a>
+                    </li>
+                  </ul>
+                </template>
               </div>
 
-              <button class="cta-button" @click="openBooking">
-                Maak nu een afspraak
-              </button>
+              <div v-else>
+                <em>Geen opties beschikbaar.</em>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </transition>
-
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue"
+import { ref, onMounted, computed } from "vue";
 
-// 🚀 Railway backend URL
-const API_BASE_URL = "https://gemistrybackend-production.up.railway.app"
+const API_BASE_URL = "https://gemistrybackend-production.up.railway.app";
 
-const services = ref([])
-const showPopup = ref(false)
-const selectedService = ref(null)
-const popupItems = ref([])
+const services = ref([]);
+const showPopup = ref(false);
+const selectedService = ref(null);
+const popupItems = ref([]);
+const popupGroupedItems = ref({});
 
-services.value = [
-  {
-    id: 1,
-    naam: "Nep Service",
-    prijs: 49.99,
-    tldr: "Dit is een korte beschrijving van een nep service.",
-    description: "Hier staat een uitgebreide uitleg over de nep service die je normaal in de database hebt staan.",
-    type: "basic",
-    image_url: "/img/placeholder.jpg"
-  }
-]
-
-
-// Data ophalen
+// === Fetch prijslijst ===
 onMounted(async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/prijslijst`)
-    services.value = await res.json()
+    const res = await fetch(`${API_BASE_URL}/api/prijslijst`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    services.value = json.map((row) => ({
+      ...row,
+      items: safeParseItems(row.items),
+    }));
   } catch (err) {
-    console.error("❌ API error:", err)
+    console.error("❌ API error:", err);
   }
-})
+});
 
-// Items ophalen per categorie_id
-async function fetchItems(categorieId) {
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/prijslijst-items/${categorieId}`)
-    return await res.json()
-  } catch (err) {
-    console.error("❌ API error:", err)
-    return []
-  }
-}
-
-// Data groeperen per type
+// === Data groeperen ===
 const groupedServices = computed(() => {
-  return services.value.reduce((groups, item) => {
-    if (!groups[item.type]) groups[item.type] = []
-    groups[item.type].push(item)
-    return groups
-  }, {})
-})
+  const buckets = {};
+  for (const cat of services.value) {
+    const gtype = cat.type || "Onbekend";
+    if (!buckets[gtype]) buckets[gtype] = { type: gtype, categories: [] };
 
-// Helpers
+    const itemBuckets = {};
+    for (const it of cat.items || []) {
+      const t = it?.type || "Onbekend";
+      (itemBuckets[t] ||= []).push(it);
+    }
+    buckets[gtype].categories.push({ ...cat, groupedItems: itemBuckets });
+  }
+  return Object.values(buckets);
+});
+
+// === Helpers ===
 function formatPrice(price) {
-  return price ? parseFloat(price).toFixed(2).replace(".", ",") : "n.v.t."
+  const n = Number(price);
+  return Number.isFinite(n) ? String(n).replace(".", ",") : String(price ?? "");
 }
-
 function resolveImage(path) {
-  if (!path) return "/img/placeholder.jpg"
-  const cleanPath = path.replace(/^@\//, "/")
-  if (!cleanPath.startsWith("/img/")) return "/img/placeholder.jpg"
-  return cleanPath
+  if (!path) return "/img/placeholder.jpg";
+  if (/^https?:\/\//i.test(path) || path.startsWith("/")) return path;
+  return path.replace(/^@\//, "/");
 }
-
 function formatType(type) {
   switch (type) {
-    case "basic": return "Basic Services"
-    case "deal": return "Deals"
-    case "gold": return "Gold Collection"
-    default: return type
+    case "basic": return "Basic Services";
+    case "deal": return "Deals";
+    case "gold": return "Gold Collection";
+    default: return type;
   }
 }
+function safeParseItems(maybe) {
+  try {
+    return Array.isArray(maybe) ? maybe : JSON.parse(maybe || "[]");
+  } catch {
+    return [];
+  }
+}
+function hasPrijs(p) {
+  return p !== null && p !== undefined && p !== "";
+}
+const hasAnyPopupItems = computed(() => popupItems.value.length > 0);
 
-// Popup
-// Popup openen
-async function openServicePopup(item) {
-  selectedService.value = item;
+// === Popup controls ===
+function openServicePopup(item, cat) {
+  const items = safeParseItems(cat.items);
+  const grouped = {};
+  for (const it of items) {
+    const t = it?.type || "Onbekend";
+    (grouped[t] ||= []).push(it);
+  }
+
+  selectedService.value = { ...cat, selectedItem: item };
+  popupItems.value = items;
+  popupGroupedItems.value = grouped;
+
   showPopup.value = true;
 
-  // lock body scroll
+  // 🔒 alles blokkeren behalve popup
   document.body.style.overflow = "hidden";
-
-  // Neppe items voor test
-  popupItems.value = [
-    { id: 101, categorie_id: 1, naam: "Extra gem", prijs: 9.99 }
-  ];
+  document.documentElement.style.overflow = "hidden";
+  document.body.style.height = "100%";
+  document.documentElement.style.height = "100%";
 }
 
-// Popup sluiten
 function closeServicePopup() {
   showPopup.value = false;
+  selectedService.value = null;
   popupItems.value = [];
+  popupGroupedItems.value = {};
 
-  // restore body scroll
+  // 🔓 scroll herstellen
   document.body.style.overflow = "";
+  document.documentElement.style.overflow = "";
+  document.body.style.height = "";
+  document.documentElement.style.height = "";
 }
 
-
-// Dummy booking
-function openBooking() {
-  alert("Boekingsfunctie hier 🚀")
-}
 </script>
 
 <style scoped>
@@ -217,7 +263,7 @@ function openBooking() {
 /* ===== GRID ===== */
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(auto, 1fr));
+  grid-template-columns: 1fr;
   margin: 0 auto;
   gap: 35px;
   padding: 0 20px;
@@ -234,7 +280,6 @@ function openBooking() {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   width: 90%;
 }
-
 
 .card-image img {
   width: 100%;
@@ -257,12 +302,6 @@ function openBooking() {
   margin: 0;
 }
 
-.price {
-  font-size: 16px;
-  font-weight: bold;
-  color: #651a1a;
-}
-
 .desc {
   font-size: 17px;
   color: #444;
@@ -270,30 +309,38 @@ function openBooking() {
   min-height: 40px;
 }
 
+.deposit {
+  font-style: italic;
+  color: #777;
+  font-size: 0.9em;
+  margin-top: 6px;
+}
+
 /* ======= POPUP ======= */
 .gem-modal-overlay {
   position: fixed;
-  inset: 0;
-  background: #f2efe8; /* geen blur, gewoon achtergrond */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100svh;
+  background: #f2efe8;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   z-index: 9999;
-  overflow-y: auto;
+  overflow: hidden; /* achtergrond niet scrollen */
+  overscroll-behavior: contain;
 }
 
 .service-modal {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 30px;
-  color: #651a1a;
   width: 100%;
   height: 100%;
+  padding: 30px;
+  color: #651a1a;
   box-sizing: border-box;
-  overflow-y: auto;
-  position: relative;
+  overflow-y: auto; /* enkel popup scrollt */
 }
-
 
 .gem-close {
   font-size: 26px;
@@ -301,13 +348,11 @@ function openBooking() {
   border: none;
   color: #651a1a;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
-
 
 .gem-header {
   display: flex;
-  justify-content: space-between; /* titel links, kruisje rechts */
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
 }
@@ -316,9 +361,9 @@ function openBooking() {
   margin: 0;
   font-size: 28px;
   font-weight: bold;
-  letter-spacing: 0.5px;
   color: #651a1a;
 }
+
 .gem-divider {
   margin: 12px auto 0 auto;
   height: 2px;
@@ -331,15 +376,16 @@ function openBooking() {
   display: flex;
   flex-direction: column;
   gap: 25px;
-  align-items: flex-start;
   margin-top: 20px;
 }
+
 .gem-body img {
   width: 100%;
   border-radius: 12px;
   object-fit: cover;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
+
 .popup-right {
   flex: 1;
   display: flex;
@@ -348,14 +394,6 @@ function openBooking() {
   text-align: left;
 }
 
-.popup-price {
-  font-weight: bold;
-  font-size: 22px;
-  background: #651a1a0d;
-  padding: 6px 12px;
-  border-radius: 8px;
-  display: inline-block;
-}
 .popup-tldr {
   font-style: italic;
   color: #555;
@@ -363,32 +401,24 @@ function openBooking() {
 }
 
 .cta-button {
-  margin-top: 20px;
-  padding: 12px 24px;
-  font-size: 18px;
-  font-weight: bold;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 20px;
+  background: #7a2222;
   color: #fff;
-  background: #651a1a;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
+  text-decoration: none;
   transition: all 0.25s ease;
-  align-self: flex-start;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
-
-
 
 .cta-button:hover {
-  background: #7a2323;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-}
-
-.cta-button:active {
-  background: #4a1111;
-  transform: translateY(1px) scale(0.98);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  background: #9b2e2e;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 /* TRANSITIONS */
@@ -402,7 +432,12 @@ function openBooking() {
   transform: scale(0.95);
 }
 
-
-
-#footer_legal { background-color: #651A1A; color: white; text-align: center; padding: 20px; font-size: 14px; position: relative; bottom: 0; width: 100%;}
+/* FOOTER */
+#footer_legal {
+  background-color: #651A1A;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+}
 </style>
