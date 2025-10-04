@@ -377,7 +377,7 @@ function resolveImage(path) {
 
 
 .group-title{
-  font-size: 28px;
+  font-size: 68px;
   font-weight: bold;
   color: #651a1a;
   text-transform: uppercase;
