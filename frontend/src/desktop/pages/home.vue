@@ -270,17 +270,91 @@
           </div>
 
           <div class="voorwaarden-content">
+            <h3>Privacyverklaring</h3>
             <p>
-              Wij hechten veel waarde aan uw privacy. Gemistry verwerkt uw gegevens uitsluitend om afspraken te beheren en contact te onderhouden.
-              Wij delen geen persoonlijke gegevens met derden, tenzij dit noodzakelijk is voor de uitvoering van onze diensten of wettelijk verplicht is.
+              Bij Gemistry hechten wij veel waarde aan jouw privacy. In deze privacyverklaring leggen wij
+              uit welke persoonsgegevens wij verzamelen, waarom we dat doen en hoe we zorgvuldig met
+              deze gegevens omgaan.
             </p>
+
+            <h3>1. Persoonsgegevens die wij verwerken</h3>
             <p>
-              Uw gegevens worden zorgvuldig bewaard en uitsluitend gebruikt voor communicatie rondom afspraken of promoties waarvoor u toestemming heeft gegeven.
+              Gemistry verwerkt jouw persoonsgegevens doordat je gebruikmaakt van onze diensten en/of
+              omdat je deze zelf aan ons verstrekt. Wij kunnen de volgende gegevens verwerken:
             </p>
+            <ul>
+              <li>Voor- en achternaam</li>
+              <li>Telefoonnummer</li>
+              <li>E-mailadres</li>
+              <li>Social media-account (indien via DM contact)</li>
+              <li>Betaalgegevens (alleen voor afhandeling van een aanbetaling of betaling)</li>
+              <li>Foto’s of video’s (uitsluitend met jouw toestemming)</li>
+            </ul>
+
+            <h3>2. Doeleinden van gegevensverwerking</h3>
+            <p>Wij gebruiken jouw gegevens voor:</p>
+            <ul>
+              <li>Het plannen en bevestigen van afspraken</li>
+              <li>Het verwerken van betalingen en aanbetalingen</li>
+              <li>Het versturen van bevestigingen of updates over jouw afspraak</li>
+              <li>Het beantwoorden van vragen via e-mail of social media</li>
+              <li>Marketingdoeleinden (zoals foto’s of video’s van jouw behandeling, uitsluitend na toestemming)</li>
+            </ul>
+
+            <h3>3. Bewaartermijn</h3>
             <p>
-              Voor vragen over ons privacybeleid kunt u contact opnemen via <b>gemistrynl@gmail.com</b>.
+              Wij bewaren jouw gegevens niet langer dan noodzakelijk is voor het doel waarvoor ze zijn
+              verzameld. Financiële gegevens worden bewaard volgens de wettelijke bewaarplicht (7 jaar).
             </p>
+
+            <h3>4. Delen van persoonsgegevens</h3>
+            <p>
+              Gemistry verkoopt jouw gegevens niet aan derden. Wij delen gegevens alleen als dit nodig
+              is voor onze dienstverlening, bijvoorbeeld met:
+            </p>
+            <ul>
+              <li>Betaalproviders</li>
+              <li>Boekingssystemen</li>
+              <li>Webhostingdiensten</li>
+            </ul>
+            <p>
+              Met deze partijen sluiten wij een verwerkersovereenkomst om jouw gegevens te beschermen.
+            </p>
+
+            <h3>5. Foto- en videomateriaal</h3>
+            <p>
+              Soms maken wij tijdens of na een behandeling foto’s of video’s voor promotie op onze
+              website of social media. Dit gebeurt alleen met jouw expliciete toestemming. Je kunt jouw
+              toestemming altijd intrekken.
+            </p>
+
+            <h3>6. Beveiliging van jouw gegevens</h3>
+            <p>
+              Wij nemen passende maatregelen om misbruik, verlies of onbevoegde toegang te
+              voorkomen. Denk aan beveiligde verbindingen (SSL) en beperkte toegang tot gegevens.
+            </p>
+
+            <h3>7. Jouw rechten</h3>
+            <p>Je hebt het recht om:</p>
+            <ul>
+              <li>Je gegevens in te zien, te laten corrigeren of verwijderen</li>
+              <li>Je toestemming in te trekken</li>
+              <li>Een klacht in te dienen bij de Autoriteit Persoonsgegevens</li>
+            </ul>
+            <p>
+              Wil je gebruikmaken van je rechten? Stuur dan een e-mail naar
+              <b><a href="mailto:gemistry.ams@gmail.com">gemistry.ams@gmail.com</a></b>.
+            </p>
+
+            <h3>8. Wijzigingen in deze privacyverklaring</h3>
+            <p>
+              Gemistry behoudt zich het recht voor deze verklaring te wijzigen. De meest recente versie is
+              altijd te vinden op onze website.
+            </p>
+
+            <p><strong>Laatste update:</strong> oktober 2025<br>© Gemistry – All rights reserved</p>
           </div>
+
         </div>
       </div>
     </transition>
@@ -413,12 +487,15 @@
 import { ref, onMounted, onBeforeUnmount, watch, computed } from "vue";
 
 // ==============================
-// DATE PICKER
+// INTERFACES
 // ==============================
-const selectedDate = ref(new Date());
-const showPopup = ref(false);
-const openPopup = () => { showPopup.value = true; };
-const closePopup = () => { showPopup.value = false; };
+interface BlogPost {
+  title: string;
+  text: string;
+  date: string;
+  images: string[];
+  extra?: string;
+}
 
 // ==============================
 // POPUP STATES
@@ -427,47 +504,37 @@ const showAppointmentPopup = ref(false);
 const showGemPopup = ref(false);
 const showCloseupPopup = ref(false);
 const showVoorwaardenPopup = ref(false);
+const showPrivacyPopup = ref(false);
+const showBlogPopup = ref(false);
 
 // ==============================
-// Scroll lock helpers
+// SCROLL LOCK
 // ==============================
 function lockScroll() {
   const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
   document.body.style.overflow = "hidden";
-  if (scrollBarWidth > 0) {
-    document.body.style.paddingRight = scrollBarWidth + "px";
-  }
+  if (scrollBarWidth > 0) document.body.style.paddingRight = scrollBarWidth + "px";
 }
 function unlockScroll() {
   document.body.style.overflow = "";
   document.body.style.paddingRight = "";
 }
-
 watch([showAppointmentPopup, showGemPopup, showCloseupPopup, showVoorwaardenPopup], (states) => {
   if (states.some(Boolean)) lockScroll();
   else unlockScroll();
 });
 
 // ==============================
-// APPOINTMENT POPUP
-// ==============================
-const openAppointmentPopup = () => { showAppointmentPopup.value = true; };
-const closeAppointmentPopup = () => { showAppointmentPopup.value = false; };
-
-// ==============================
-// GEM POPUP
+// GEM POPUP (same as before)
 // ==============================
 const gemModules = import.meta.glob(
     "@/desktop/assets/img/gems/*.{png,jpg,jpeg,gif,webp,JPG}",
     { eager: true }
 );
 const gemImages = Object.values(gemModules).map((m: any) => m.default) as string[];
-
 const currentGemIndex = ref(0);
 const selectedGem = ref<string>("");
-
 const preload = (src: string) => { const i = new Image(); i.src = src; };
-
 const openGemPopup = () => {
   if (gemImages.length > 0) {
     currentGemIndex.value = 0;
@@ -476,8 +543,7 @@ const openGemPopup = () => {
   }
   showGemPopup.value = true;
 };
-const closeGemPopup = () => { showGemPopup.value = false; };
-
+const closeGemPopup = () => (showGemPopup.value = false);
 const goToGem = (i: number) => {
   if (!gemImages.length) return;
   currentGemIndex.value = (i + gemImages.length) % gemImages.length;
@@ -498,12 +564,9 @@ const closeupModules = import.meta.glob(
     { eager: true }
 );
 const closeupImages = Object.values(closeupModules).map((m: any) => m.default) as string[];
-
 const currentCloseupIndex = ref(0);
 const selectedCloseup = ref<string>("");
-
 const preloadCloseup = (src: string) => { const i = new Image(); i.src = src; };
-
 const openCloseupPopup = () => {
   if (closeupImages.length > 0) {
     currentCloseupIndex.value = 0;
@@ -512,8 +575,7 @@ const openCloseupPopup = () => {
   }
   showCloseupPopup.value = true;
 };
-const closeCloseupPopup = () => { showCloseupPopup.value = false; };
-
+const closeCloseupPopup = () => (showCloseupPopup.value = false);
 const goToCloseup = (i: number) => {
   if (!closeupImages.length) return;
   currentCloseupIndex.value = (i + closeupImages.length) % closeupImages.length;
@@ -527,7 +589,7 @@ const nextCloseup = () => goToCloseup(currentCloseupIndex.value + 1);
 const prevCloseup = () => goToCloseup(currentCloseupIndex.value - 1);
 
 // ==============================
-// RANDOM IMAGES (3 tegelijk)
+// RANDOM IMAGES (voor header)
 // ==============================
 const modules = import.meta.glob(
     "@/desktop/assets/img/random_image/*.{png,jpg,jpeg,gif,webp,JPG}",
@@ -536,7 +598,6 @@ const modules = import.meta.glob(
 const images = Object.values(modules).map((m: any) => m.default);
 const currentImages = ref<string[]>([]);
 let intervalId: number | null = null;
-
 const pickRandomImages = () => {
   if (images.length === 0) return;
   const chosen: string[] = [];
@@ -546,7 +607,6 @@ const pickRandomImages = () => {
   }
   currentImages.value = chosen;
 };
-
 onMounted(() => {
   pickRandomImages();
   if (images.length > 1) intervalId = window.setInterval(pickRandomImages, 2000);
@@ -554,105 +614,87 @@ onMounted(() => {
 onBeforeUnmount(() => { if (intervalId) clearInterval(intervalId); });
 
 // ==============================
-// GALLERY ITEMS
+// GALLERY
 // ==============================
 const galleryItems = ref([
   {
     foto: new URL('@/desktop/assets/img/gems/IMG_6667.jpg', import.meta.url).href,
     title: "GEMISTRY GEMS",
-    naam: "Ines",
-    description: '"Ik wilde al een tijd een toothgem uitproberen..."',
     popup: "gem",
   },
   {
     foto: new URL('@/desktop/assets/img/closeup/kaolo.JPG', import.meta.url).href,
     title: "CLOSE-UP VIEW",
-    naam: "Chelsey",
-    description: '"Ik had een ontwerp uitgekozen..."',
     popup: "closeup",
   },
   {
     foto: new URL('@/desktop/assets/img/random_image/IMG_4072.jpg', import.meta.url).href,
     title: "EVENTS",
-    naam: "Club Nyx",
-    description: "Bij Club NYX mochten wij bezoekers voorzien...",
     popup: "events",
   },
 ]);
-
 type GalleryItem = { popup?: string };
 const handleCardClick = (item: GalleryItem) => {
   if (item.popup === "gem") return openGemPopup();
   if (item.popup === "closeup") return openCloseupPopup();
   if (item.popup === "events") {
-    // TODO: events-popup
+    // eventueel events-popup toevoegen
   }
 };
 
 // ==============================
-// BLOGPOSTS – Dynamisch laden uit /assets/blog/
+// BLOGPOSTS – Dynamisch laden (Railway-proof)
 // ==============================
-interface BlogPost {
-  title: string;
-  text: string;
-  date: string;
-  images: string[];
-  extra?: string;
-}
-
 const blogPosts = ref<BlogPost[]>([]);
 
-// Zoek naar alle post.json-bestanden in /assets/blog/
+// 1️⃣ alle post.json-bestanden
 const blogFolders = import.meta.glob(
     "@/desktop/assets/blog/*/post.json",
     { eager: true, import: "default" }
 );
 
+// 2️⃣ alle hoofdafbeeldingen (main.jpg)
+const mainImages = import.meta.glob(
+    "@/desktop/assets/blog/**/main.jpg",
+    { eager: true }
+);
+
+// 3️⃣ alle galerij-afbeeldingen
+const galleryModules = import.meta.glob(
+    "@/desktop/assets/blog/**/gallery/*.{jpg,jpeg,png,webp,JPG}",
+    { eager: true }
+);
+
+// 4️⃣ combineren
 for (const path in blogFolders) {
   const folder = path.replace("/post.json", "");
   const postData = blogFolders[path] as Omit<BlogPost, "images">;
 
-  // hoofdafbeelding (main.jpg)
-  const mainImg = new URL(`${folder}/main.jpg`, import.meta.url).href;
-
-  // alle galerij-afbeeldingen (gallery/)
-// Laad ALLE galerij-afbeeldingen in één keer
-  const galleryModules = import.meta.glob(
-      "@/desktop/assets/blog/**/gallery/*.{jpg,jpeg,png,webp,JPG}",
-      { eager: true }
+  // hoofdafbeelding zoeken
+  const mainImgEntry = Object.entries(mainImages).find(([imgPath]) =>
+      imgPath.startsWith(folder)
   );
+  const mainImg = mainImgEntry ? (mainImgEntry[1] as any).default : "";
 
-  for (const path in blogFolders) {
-    const folder = path.replace("/post.json", "");
-    const postData = blogFolders[path] as Omit<BlogPost, "images">;
+  // galerij-afbeeldingen voor dit specifieke pad
+  const galleryImages = Object.entries(galleryModules)
+      .filter(([imgPath]) => imgPath.startsWith(folder))
+      .map(([_, mod]: any) => mod.default);
 
-    // hoofdafbeelding
-    const mainImg = new URL(`${folder}/main.jpg`, import.meta.url).href;
-
-    // filter galerij-afbeeldingen voor dit specifieke folderpad
-    const galleryImages = Object.entries(galleryModules)
-        .filter(([imgPath]) => imgPath.startsWith(folder))
-        .map(([_, mod]: any) => mod.default);
-
-    blogPosts.value.push({
-      ...postData,
-      images: [mainImg, ...galleryImages],
-    });
-  }
-
-
-
+  blogPosts.value.push({
+    ...postData,
+    images: [mainImg, ...galleryImages],
+  });
 }
 
-// optioneel sorteren op datum
+// 5️⃣ sorteren op datum (nieuwste eerst)
 blogPosts.value.sort((a, b) => (a.date < b.date ? 1 : -1));
 
 // ==============================
-// BLOG SLIDER
+// BLOG SLIDER + POPUP
 // ==============================
 const currentIndex = ref(0);
 const visiblePosts = computed(() => [blogPosts.value[currentIndex.value]]);
-
 function nextPost() {
   if (blogPosts.value.length === 0) return;
   currentIndex.value = (currentIndex.value + 1) % blogPosts.value.length;
@@ -662,22 +704,14 @@ function prevPost() {
   currentIndex.value = (currentIndex.value - 1 + blogPosts.value.length) % blogPosts.value.length;
 }
 
-// ==============================
-// BLOG POPUP STATE
-// ==============================
-const showBlogPopup = ref(false);
 const selectedPost = ref<BlogPost>({} as BlogPost);
 const currentImageIndex = ref(0);
-
 function openBlogPopup(post: BlogPost) {
   selectedPost.value = post;
   currentImageIndex.value = 0;
   showBlogPopup.value = true;
 }
-function closeBlogPopup() {
-  showBlogPopup.value = false;
-}
-
+function closeBlogPopup() { showBlogPopup.value = false; }
 function nextImage() {
   if (!selectedPost.value.images) return;
   currentImageIndex.value = (currentImageIndex.value + 1) % selectedPost.value.images.length;
@@ -688,23 +722,21 @@ function prevImage() {
       (currentImageIndex.value - 1 + selectedPost.value.images.length) %
       selectedPost.value.images.length;
 }
-function goToImage(i: number) {
-  currentImageIndex.value = i;
-}
+function goToImage(i: number) { currentImageIndex.value = i; }
 
-const showPrivacyPopup = ref(false);
-
+// ==============================
+// PRIVACY / VOORWAARDEN POPUPS
+// ==============================
 const openVoorwaardenPopup = () => (showVoorwaardenPopup.value = true);
 const closeVoorwaardenPopup = () => (showVoorwaardenPopup.value = false);
 const openPrivacyPopup = () => (showPrivacyPopup.value = true);
 const closePrivacyPopup = () => (showPrivacyPopup.value = false);
-
-/* Scroll lock bij open modals */
 watch([showVoorwaardenPopup, showPrivacyPopup], (states) => {
   if (states.some(Boolean)) document.body.style.overflow = "hidden";
   else document.body.style.overflow = "";
 });
 </script>
+
 
 
 

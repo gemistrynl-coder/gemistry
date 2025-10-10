@@ -165,37 +165,200 @@
       </div>
     </transition>
 
-    <!-- Privacy & Voorwaarden -->
+    <!-- === ALGEMENE VOORWAARDEN POPUP === -->
     <transition name="popup-fade">
-      <div v-if="showVoorwaardenPopup" class="gem-modal-overlay">
-        <div class="popup-header">
-          <h2>Algemene voorwaarden</h2>
+      <div v-if="showVoorwaardenPopup" class="gem-modal-overlay" @click.self="closeVoorwaardenPopup">
+        <div class="voorwaarden-modal">
           <button class="gem-close" @click="closeVoorwaardenPopup">×</button>
-        </div>
-        <div class="popup-content">
-          <p class="popup-text">
-            Dit zijn de algemene voorwaarden van Gemistry. Hierin staat informatie over afspraken,
-            betalingen, annuleringen en aansprakelijkheid. Door gebruik te maken van onze diensten
-            stemt u in met deze voorwaarden.
-          </p>
+          <div class="voorwaarden-header">
+            <h2>Algemene voorwaarden</h2>
+            <div class="gem-divider"></div>
+          </div>
+
+          <div class="voorwaarden-content">
+            <p><strong>Algemene voorwaarden Gemistry.</strong></p>
+            <p>
+              Deze algemene voorwaarden zijn van toepassing op alle afspraken en behandelingen bij
+              Gemistry. Door een afspraak te maken bij Gemistry gaat de klant akkoord met deze
+              voorwaarden.
+            </p>
+
+            <h3>Gezondheid & verantwoordelijkheid</h3>
+            <p>
+              De klant is zelf verantwoordelijk voor het correct en volledig invullen van het intakeformulier.
+              Behandelingen worden niet uitgevoerd bij slechte mondgezondheid, losse tanden,
+              tandvleesproblemen of medische aandoeningen die risico’s kunnen opleveren. Gemistry
+              plaatst geen toothgems bij klanten jonger dan 16 jaar zonder toestemming van een ouder of
+              voogd.
+            </p>
+
+            <h3>Voorbereiding & nazorg</h3>
+            <p>
+              Klanten dienen met gepoetste tanden op de afspraak te verschijnen. Na de behandeling
+              mogen gedurende 24 uur geen harde of kleverige etenswaren genuttigd worden. Gemistry is
+              niet aansprakelijk voor verlies of beschadiging van de gem door onvoldoende nazorg of het
+              niet opvolgen van de adviezen.
+            </p>
+
+            <h3>Duur & resultaat</h3>
+            <p>
+              Toothgems zijn een semi-permanente behandeling: de duur varieert van enkele maanden tot
+              jaren. Gemistry kan geen garantie geven op de exacte draagtijd, aangezien dit afhankelijk is
+              van mondhygiëne en leefstijl.
+            </p>
+
+            <h3>Aansprakelijkheid</h3>
+            <p>
+              Gemistry werkt uitsluitend met veilige en professionele materialen, waaronder Swarovski
+              kristallen en 18k goud. Er wordt zorgvuldig gewerkt, maar Gemistry is niet aansprakelijk voor
+              schade die ontstaat door oneigenlijk gebruik, eigenhandig verwijderen van de gem of
+              onderliggende tandproblemen.
+            </p>
+
+            <h3>Betaling & annulering</h3>
+            <p>
+              Voor iedere afspraak wordt een aanbetaling gevraagd. Deze aanbetaling bedraagt 50% van
+              het totaalbedrag bij alle gems of custom designs. De aanbetaling wordt verrekend met het
+              totaalbedrag op de dag van de afspraak. Bij annulering binnen 24 uur voor de afspraak of bij
+              niet verschijnen vervalt de aanbetaling. Annuleert de klant eerder dan 24 uur voor de
+              afspraak, dan wordt de aanbetaling teruggestort.
+            </p>
+            <p>
+              Klanten wordt verzocht op tijd aanwezig te zijn. Bij meer dan 10 minuten te laat kan de
+              afspraak worden geannuleerd om het dagschema niet te verstoren. In dat geval vervalt de
+              aanbetaling. Alleen indien de agenda dit toelaat, kan de behandeling doorgaan. Hierbij
+              kunnen extra kosten in rekening worden gebracht.
+            </p>
+
+            <h3>Events</h3>
+            <p>
+              Tijdens evenementen gelden aangepaste prijzen. Custom designs zijn afhankelijk van
+              beschikbaarheid en kunnen bij drukte beperkt zijn. Gemistry behoudt zich het recht voor om
+              een behandeling te weigeren indien dit niet veilig of haalbaar is binnen de eventsetting.
+            </p>
+
+            <h3>Foto en videomateriaal</h3>
+            <p>
+              Gemistry kan tijdens afspraken en evenementen foto’s of video’s maken van het resultaat
+              van de behandeling. Dit materiaal kan worden gebruikt voor promotionele doeleinden, zoals
+              op de website, sociale media en marketinguitingen van Gemistry.
+            </p>
+            <p>
+              Indien de klant niet zichtbaar in beeld wil komen, kan dit voorafgaand aan de behandeling
+              worden aangegeven. In dat geval worden uitsluitend detailfoto’s van de tanden en het
+              geplaatste design gebruikt, zonder dat het gezicht herkenbaar in beeld komt.
+            </p>
+
+            <h3>Overig</h3>
+            <p>
+              Persoonlijke gegevens worden uitsluitend gebruikt voor communicatie rondom afspraken en
+              worden vertrouwelijk behandeld. Door akkoord te gaan met deze voorwaarden bevestigt de
+              klant dat hij of zij begrijpt dat een toothgem een cosmetische en tijdelijke toevoeging is.
+            </p>
+          </div>
         </div>
       </div>
     </transition>
 
+    <!-- === PRIVACY POLICY POPUP === -->
     <transition name="popup-fade">
-      <div v-if="showPrivacyPopup" class="gem-modal-overlay">
-        <div class="popup-header">
-          <h2>Privacy policy</h2>
+      <div v-if="showPrivacyPopup" class="gem-modal-overlay" @click.self="closePrivacyPopup">
+        <div class="voorwaarden-modal">
           <button class="gem-close" @click="closePrivacyPopup">×</button>
-        </div>
-        <div class="popup-content">
-          <p class="popup-text">
-            Wij hechten waarde aan uw privacy. Gemistry verwerkt uw gegevens uitsluitend om afspraken
-            te beheren en contact te onderhouden. We delen geen informatie met derden zonder uw toestemming.
-          </p>
+          <div class="voorwaarden-header">
+            <h2>Privacy Policy</h2>
+            <div class="gem-divider"></div>
+          </div>
+
+          <div class="voorwaarden-content">
+            <h3>Privacyverklaring</h3>
+            <p>
+              Bij Gemistry hechten wij veel waarde aan jouw privacy. In deze privacyverklaring leggen wij
+              uit welke persoonsgegevens wij verzamelen, waarom we dat doen en hoe we zorgvuldig met
+              deze gegevens omgaan.
+            </p>
+
+            <h3>1. Persoonsgegevens die wij verwerken</h3>
+            <p>
+              Gemistry verwerkt jouw persoonsgegevens doordat je gebruikmaakt van onze diensten en/of
+              omdat je deze zelf aan ons verstrekt. Wij kunnen de volgende gegevens verwerken:
+            </p>
+            <ul>
+              <li>Voor- en achternaam</li>
+              <li>Telefoonnummer</li>
+              <li>E-mailadres</li>
+              <li>Social media-account (indien via DM contact)</li>
+              <li>Betaalgegevens (alleen voor afhandeling van een aanbetaling of betaling)</li>
+              <li>Foto’s of video’s (uitsluitend met jouw toestemming)</li>
+            </ul>
+
+            <h3>2. Doeleinden van gegevensverwerking</h3>
+            <p>Wij gebruiken jouw gegevens voor:</p>
+            <ul>
+              <li>Het plannen en bevestigen van afspraken</li>
+              <li>Het verwerken van betalingen en aanbetalingen</li>
+              <li>Het versturen van bevestigingen of updates over jouw afspraak</li>
+              <li>Het beantwoorden van vragen via e-mail of social media</li>
+              <li>Marketingdoeleinden (zoals foto’s of video’s van jouw behandeling, uitsluitend na toestemming)</li>
+            </ul>
+
+            <h3>3. Bewaartermijn</h3>
+            <p>
+              Wij bewaren jouw gegevens niet langer dan noodzakelijk is voor het doel waarvoor ze zijn
+              verzameld. Financiële gegevens worden bewaard volgens de wettelijke bewaarplicht (7 jaar).
+            </p>
+
+            <h3>4. Delen van persoonsgegevens</h3>
+            <p>
+              Gemistry verkoopt jouw gegevens niet aan derden. Wij delen gegevens alleen als dit nodig
+              is voor onze dienstverlening, bijvoorbeeld met:
+            </p>
+            <ul>
+              <li>Betaalproviders</li>
+              <li>Boekingssystemen</li>
+              <li>Webhostingdiensten</li>
+            </ul>
+            <p>
+              Met deze partijen sluiten wij een verwerkersovereenkomst om jouw gegevens te beschermen.
+            </p>
+
+            <h3>5. Foto- en videomateriaal</h3>
+            <p>
+              Soms maken wij tijdens of na een behandeling foto’s of video’s voor promotie op onze
+              website of social media. Dit gebeurt alleen met jouw expliciete toestemming. Je kunt jouw
+              toestemming altijd intrekken.
+            </p>
+
+            <h3>6. Beveiliging van jouw gegevens</h3>
+            <p>
+              Wij nemen passende maatregelen om misbruik, verlies of onbevoegde toegang te
+              voorkomen. Denk aan beveiligde verbindingen (SSL) en beperkte toegang tot gegevens.
+            </p>
+
+            <h3>7. Jouw rechten</h3>
+            <p>Je hebt het recht om:</p>
+            <ul>
+              <li>Je gegevens in te zien, te laten corrigeren of verwijderen</li>
+              <li>Je toestemming in te trekken</li>
+              <li>Een klacht in te dienen bij de Autoriteit Persoonsgegevens</li>
+            </ul>
+            <p>
+              Wil je gebruikmaken van je rechten? Stuur dan een e-mail naar
+              <b><a href="mailto:gemistry.ams@gmail.com">gemistry.ams@gmail.com</a></b>.
+            </p>
+
+            <h3>8. Wijzigingen in deze privacyverklaring</h3>
+            <p>
+              Gemistry behoudt zich het recht voor deze verklaring te wijzigen. De meest recente versie is
+              altijd te vinden op onze website.
+            </p>
+
+            <p><strong>Laatste update:</strong> oktober 2025<br>© Gemistry – All rights reserved</p>
+          </div>
         </div>
       </div>
     </transition>
+
   </div>
 </template>
 
@@ -733,5 +896,106 @@ footer {
     font-size: 17px;
   }
 }
+
+/* === VOORWAARDEN & PRIVACY POPUPS === */
+.voorwaarden-modal {
+  background: #fdfdfd;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+  width: 82%;
+  height: 100%;
+  max-width: 700px;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 28px 22px 40px;
+  margin-top: 50px;
+  color: #333;
+  scrollbar-gutter: stable;
+}
+
+.voorwaarden-header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.voorwaarden-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #651a1a;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.gem-divider {
+  width: 50px;
+  height: 3px;
+  background: #651a1a;
+  margin: 10px auto 20px auto;
+  border-radius: 3px;
+}
+
+.voorwaarden-content {
+  font-size: 15px;
+  line-height: 1.7;
+  text-align: left;
+  overflow-y: auto;
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* IE/Edge */
+}
+.voorwaarden-content::-webkit-scrollbar {
+  display: none;               /* Chrome/Safari */
+}
+
+.voorwaarden-content h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #651a1a;
+  margin: 18px 0 6px;
+  text-transform: uppercase;
+}
+
+.voorwaarden-content p {
+  margin: 8px 0 12px;
+  color: #333;
+}
+
+.voorwaarden-content ul {
+  margin: 6px 0 12px 18px;
+  padding: 0;
+  list-style: disc;
+}
+
+.voorwaarden-content li {
+  margin-bottom: 6px;
+  line-height: 1.6;
+}
+
+.voorwaarden-content a {
+  color: #651a1a;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+.voorwaarden-content a:hover {
+  color: #a42c2c;
+}
+
+/* Responsiveness */
+@media (max-width: 480px) {
+  .voorwaarden-modal {
+    width: 95%;
+    padding: 22px 18px 30px;
+    max-height: 88vh;
+  }
+  .voorwaarden-header h2 {
+    font-size: 20px;
+  }
+  .voorwaarden-content {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+
 
 </style>
