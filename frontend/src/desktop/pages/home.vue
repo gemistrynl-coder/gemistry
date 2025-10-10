@@ -738,7 +738,6 @@ watch([showVoorwaardenPopup, showPrivacyPopup], (states) => {
   margin: auto;
   background-color: #F2EFE8;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  border-radius: 0 0 5px 5px;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
@@ -906,7 +905,6 @@ footer {
   color: #651a1a;
   text-align: center;
   font-family: 'Didot', 'Playfair Display', 'Georgia', serif;
-  padding: 80px 20px 0;
 }
 
 /* --- Social Media --- */
