@@ -118,7 +118,6 @@
       </div>
     </main>
 
-    <!-- FOOTER -->
     <footer>
       <div id="social_media">
         <div id="left">
@@ -134,17 +133,18 @@
 
           <div id="contact_us">
             <h2>Contact Us</h2>
+            <p><strong>Email</strong><br>gemistrynl@gmail.com</p>
+
             <div class="contact-columns">
               <div class="contact-col">
                 <p><strong>Phone</strong><br>+31 658965703</p>
-                <p><strong>Email</strong><br>gemistrynl@gmail.com</p>
-                <p><strong>BTW-NUMMER</strong><br>NL005301771B83</p>
-                <p><strong>Didi Zeilstra</strong></p>
+
+                <p><strong>Didi Zeilstra</strong><br />KvK: 97986178<br /></p>
               </div>
               <div class="contact-col"></div>
               <div class="contact-col">
                 <p><strong>Address</strong><br>Amsterdam Zuid</p>
-                <p><strong>Dean Davies</strong></p>
+                <p><strong>Dean Davies</strong><br />KvK: 98163221<br /></p>
               </div>
             </div>
             <p style="margin-top:20px;">
@@ -156,74 +156,235 @@
       </div>
 
       <div id="footer_legal">
-        <p>Privacy policy | Algemene voorwaarden</p>
+        <p>
+          <span @click="openPrivacyPopup">Privacy policy</span> |
+          <span @click="openVoorwaardenPopup">Algemene voorwaarden</span>
+        </p>
         <p>© 2025 Gemistry. Alle rechten voorbehouden.</p>
       </div>
     </footer>
 
-    <!-- GEM POPUP -->
+    <!-- === ALGEMENE VOORWAARDEN POPUP === -->
+    <transition name="popup-fade">
+      <div v-if="showVoorwaardenPopup" class="gem-modal-overlay" @click.self="closeVoorwaardenPopup">
+        <div class="voorwaarden-modal">
+          <button class="gem-close" @click="closeVoorwaardenPopup">×</button>
+          <div class="voorwaarden-header">
+            <h2>Algemene voorwaarden</h2>
+            <div class="gem-divider"></div>
+          </div>
+
+          <div class="voorwaarden-content">
+            <p><strong>Algemene voorwaarden Gemistry.</strong></p>
+            <p>
+              Deze algemene voorwaarden zijn van toepassing op alle afspraken en behandelingen bij
+              Gemistry. Door een afspraak te maken bij Gemistry gaat de klant akkoord met deze
+              voorwaarden.
+            </p>
+
+            <h3>Gezondheid & verantwoordelijkheid</h3>
+            <p>
+              De klant is zelf verantwoordelijk voor het correct en volledig invullen van het intakeformulier.
+              Behandelingen worden niet uitgevoerd bij slechte mondgezondheid, losse tanden,
+              tandvleesproblemen of medische aandoeningen die risico’s kunnen opleveren. Gemistry
+              plaatst geen toothgems bij klanten jonger dan 16 jaar zonder toestemming van een ouder of
+              voogd.
+            </p>
+
+            <h3>Voorbereiding & nazorg</h3>
+            <p>
+              Klanten dienen met gepoetste tanden op de afspraak te verschijnen. Na de behandeling
+              mogen gedurende 24 uur geen harde of kleverige etenswaren genuttigd worden. Gemistry is
+              niet aansprakelijk voor verlies of beschadiging van de gem door onvoldoende nazorg of het
+              niet opvolgen van de adviezen.
+            </p>
+
+            <h3>Duur & resultaat</h3>
+            <p>
+              Toothgems zijn een semi-permanente behandeling: de duur varieert van enkele maanden tot
+              jaren. Gemistry kan geen garantie geven op de exacte draagtijd, aangezien dit afhankelijk is
+              van mondhygiëne en leefstijl.
+            </p>
+
+            <h3>Aansprakelijkheid</h3>
+            <p>
+              Gemistry werkt uitsluitend met veilige en professionele materialen, waaronder Swarovski
+              kristallen en 18k goud. Er wordt zorgvuldig gewerkt, maar Gemistry is niet aansprakelijk voor
+              schade die ontstaat door oneigenlijk gebruik, eigenhandig verwijderen van de gem of
+              onderliggende tandproblemen.
+            </p>
+
+            <h3>Betaling & annulering</h3>
+            <p>
+              Voor iedere afspraak wordt een aanbetaling gevraagd. Deze aanbetaling bedraagt 50% van
+              het totaalbedrag bij alle gems of custom designs. De aanbetaling wordt verrekend met het
+              totaalbedrag op de dag van de afspraak. Bij annulering binnen 24 uur voor de afspraak of bij
+              niet verschijnen vervalt de aanbetaling. Annuleert de klant eerder dan 24 uur voor de
+              afspraak, dan wordt de aanbetaling teruggestort.
+            </p>
+            <p>
+              Klanten wordt verzocht op tijd aanwezig te zijn. Bij meer dan 10 minuten te laat kan de
+              afspraak worden geannuleerd om het dagschema niet te verstoren. In dat geval vervalt de
+              aanbetaling. Alleen indien de agenda dit toelaat, kan de behandeling doorgaan. Hierbij
+              kunnen extra kosten in rekening worden gebracht.
+            </p>
+
+            <h3>Events</h3>
+            <p>
+              Tijdens evenementen gelden aangepaste prijzen. Custom designs zijn afhankelijk van
+              beschikbaarheid en kunnen bij drukte beperkt zijn. Gemistry behoudt zich het recht voor om
+              een behandeling te weigeren indien dit niet veilig of haalbaar is binnen de eventsetting.
+            </p>
+
+            <h3>Foto en videomateriaal</h3>
+            <p>
+              Gemistry kan tijdens afspraken en evenementen foto’s of video’s maken van het resultaat
+              van de behandeling. Dit materiaal kan worden gebruikt voor promotionele doeleinden, zoals
+              op de website, sociale media en marketinguitingen van Gemistry.
+            </p>
+            <p>
+              Indien de klant niet zichtbaar in beeld wil komen, kan dit voorafgaand aan de behandeling
+              worden aangegeven. In dat geval worden uitsluitend detailfoto’s van de tanden en het
+              geplaatste design gebruikt, zonder dat het gezicht herkenbaar in beeld komt.
+            </p>
+
+            <h3>Overig</h3>
+            <p>
+              Persoonlijke gegevens worden uitsluitend gebruikt voor communicatie rondom afspraken en
+              worden vertrouwelijk behandeld. Door akkoord te gaan met deze voorwaarden bevestigt de
+              klant dat hij of zij begrijpt dat een toothgem een cosmetische en tijdelijke toevoeging is.
+            </p>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- === PRIVACY POLICY POPUP === -->
+    <transition name="popup-fade">
+      <div v-if="showPrivacyPopup" class="gem-modal-overlay" @click.self="closePrivacyPopup">
+        <div class="voorwaarden-modal">
+          <button class="gem-close" @click="closePrivacyPopup">×</button>
+          <div class="voorwaarden-header">
+            <h2>Privacy Policy</h2>
+            <div class="gem-divider"></div>
+          </div>
+
+          <div class="voorwaarden-content">
+            <p>
+              Wij hechten veel waarde aan uw privacy. Gemistry verwerkt uw gegevens uitsluitend om afspraken te beheren en contact te onderhouden.
+              Wij delen geen persoonlijke gegevens met derden, tenzij dit noodzakelijk is voor de uitvoering van onze diensten of wettelijk verplicht is.
+            </p>
+            <p>
+              Uw gegevens worden zorgvuldig bewaard en uitsluitend gebruikt voor communicatie rondom afspraken of promoties waarvoor u toestemming heeft gegeven.
+            </p>
+            <p>
+              Voor vragen over ons privacybeleid kunt u contact opnemen via <b>gemistrynl@gmail.com</b>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+
+
+
+    <!-- === GEMISTRY GEM POPUP === -->
     <div v-if="showGemPopup" class="gem-modal-overlay" @click.self="closeGemPopup">
       <div class="gem-modal">
-        <button class="gem-close" @click="closeGemPopup" aria-label="Sluiten">×</button>
         <div class="gem-header">
           <h2>Gemistry’s gems.</h2>
-          <div class="gem-divider"></div>
+          <button class="gem-close" @click="closeGemPopup" aria-label="Sluiten">×</button>
         </div>
+
+        <div class="gem-divider"></div>
+
         <div class="gem-body">
           <div class="gem-copy">
-            <p>Onze klanten en modellen zijn het hart van ons merk...</p>
-            <p>We zijn continu op zoek naar mensen die ons merk willen vertegenwoordigen...</p>
+            <p>Onze klanten en modellen zijn het hart van ons
+              merk. Iedere glimlach die we vastleggen vertelt
+              een verhaal. Van subtiel en speels tot opvallend
+              en uniek. Wij gaan altijd tot het uiterste om een
+              resultaat neer te zetten dat niet alleen straalt,
+              maar ook past bij de persoonlijkheid van degene
+              die het draagt.
+              We zijn continu op zoek naar mensen die ons merk
+              willen vertegenwoordigen en onderdeel willen
+              worden van de Gemistry fam. Door samen te
+              werken met modellen en creators kunnen we laten
+              zien dat toothgems meer zijn dan een accessoire,
+              het is een lifestyle, een vibe, een statement.
+              Een deel van onze foto’s is prachtig vastgelegd
+              door @wendi.regelt op Instagram. Haar oog voor
+              detail en stijl helpt ons om de energie van
+              Gemistry tot leven te brengen.</p>
             <p class="gem-cta-wrap">
               <a href="/services"><button class="gem-cta">MAAK EEN AFSPRAAK</button></a>
             </p>
           </div>
+
           <div class="gem-image-wrap">
             <img :src="selectedGem" alt="Gemistry gallery image" class="gem-image" />
-            <button class="gem-nav gem-prev" @click="prevGem" aria-label="Vorige">‹</button>
-            <button class="gem-nav gem-next" @click="nextGem" aria-label="Volgende">›</button>
-            <div class="gem-dots">
-              <span
-                  v-for="(g, i) in gemImages"
-                  :key="g"
-                  class="gem-dot"
-                  :class="{ active: i === currentGemIndex }"
-                  @click="goToGem(i)"
-              />
+            <div id="gem-image-wrap-nav">
+              <button class="gem-nav gem-prev" @click="prevGem" aria-label="Vorige">‹</button>
+              <button class="gem-nav gem-next" @click="nextGem" aria-label="Volgende">›</button>
             </div>
+
           </div>
+        </div>
+
+        <div class="gem-dots">
+      <span
+          v-for="(g, i) in gemImages"
+          :key="g"
+          class="gem-dot"
+          :class="{ active: i === currentGemIndex }"
+          @click="goToGem(i)"
+      ></span>
         </div>
       </div>
     </div>
 
-    <!-- CLOSEUP POPUP -->
+    <!-- === CLOSE-UP VIEW POPUP === -->
     <div v-if="showCloseupPopup" class="gem-modal-overlay" @click.self="closeCloseupPopup">
       <div class="gem-modal">
-        <button class="gem-close" @click="closeCloseupPopup" aria-label="Sluiten">×</button>
         <div class="gem-header">
           <h2>Close-up view</h2>
-          <div class="gem-divider"></div>
+          <button class="gem-close" @click="closeCloseupPopup" aria-label="Sluiten">×</button>
         </div>
+
+        <div class="gem-divider"></div>
+
         <div class="gem-body">
           <div class="gem-copy">
-            <p>Details make the difference...</p>
+            <p>
+              Details make the difference. Hier vind je close-upfoto’s van onze toothgems.
+              Elk design is met zorg geplaatst, van subtiele Swarovski kristallen tot opvallende
+              custom creaties en 18k gouden accenten. Close-ups laten zien waar Gemistry
+              voor staat — precisie, hygiëne en creativiteit.
+            </p>
           </div>
+
           <div class="gem-image-wrap">
-            <img :src="selectedCloseup" alt="Closeup image" class="gem-image" />
-            <button class="gem-nav gem-prev" @click="prevCloseup" aria-label="Vorige">‹</button>
-            <button class="gem-nav gem-next" @click="nextCloseup" aria-label="Volgende">›</button>
-            <div class="gem-dots">
-              <span
-                  v-for="(c, i) in closeupImages"
-                  :key="c"
-                  class="gem-dot"
-                  :class="{ active: i === currentCloseupIndex }"
-                  @click="goToCloseup(i)"
-              />
+            <img :src="selectedCloseup" alt="Close-up gallery image" class="gem-image" />
+            <div id="gem-image-wrap-nav">
+              <button class="gem-nav gem-prev" @click="prevCloseup" aria-label="Vorige">‹</button>
+              <button class="gem-nav gem-next" @click="nextCloseup" aria-label="Volgende">›</button>
             </div>
           </div>
         </div>
+
+        <div class="gem-dots">
+      <span
+          v-for="(c, i) in closeupImages"
+          :key="c"
+          class="gem-dot"
+          :class="{ active: i === currentCloseupIndex }"
+          @click="goToCloseup(i)"
+      ></span>
+        </div>
       </div>
     </div>
+
 
     <!-- APPOINTMENT POPUP -->
     <div
@@ -530,6 +691,19 @@ function prevImage() {
 function goToImage(i: number) {
   currentImageIndex.value = i;
 }
+
+const showPrivacyPopup = ref(false);
+
+const openVoorwaardenPopup = () => (showVoorwaardenPopup.value = true);
+const closeVoorwaardenPopup = () => (showVoorwaardenPopup.value = false);
+const openPrivacyPopup = () => (showPrivacyPopup.value = true);
+const closePrivacyPopup = () => (showPrivacyPopup.value = false);
+
+/* Scroll lock bij open modals */
+watch([showVoorwaardenPopup, showPrivacyPopup], (states) => {
+  if (states.some(Boolean)) document.body.style.overflow = "hidden";
+  else document.body.style.overflow = "";
+});
 </script>
 
 
@@ -537,6 +711,10 @@ function goToImage(i: number) {
 
 
 <style scoped>
+
+/* ==========================================================
+   🌍 GLOBAL SETTINGS
+========================================================== */
 :global(html, body) {
   margin: 0;
   padding: 0;
@@ -550,7 +728,9 @@ function goToImage(i: number) {
   src: url('@/desktop/assets/font/Vogue.ttf');
 }
 
-/* Pagina */
+/* ==========================================================
+   🧱 PAGE LAYOUT
+========================================================== */
 .page {
   width: 100%;
   max-width: 100%;
@@ -559,13 +739,15 @@ function goToImage(i: number) {
   background-color: #F2EFE8;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   border-radius: 0 0 5px 5px;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
-/* Main image */
+/* ==========================================================
+   🖼️ MAIN IMAGE SECTION
+========================================================== */
 #main_image {
   height: 100vh;
   display: flex;
@@ -596,13 +778,6 @@ function goToImage(i: number) {
   text-align: center;
 }
 
-@keyframes slideIn {
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 #main_image_div button {
   font-size: 24px;
   padding: 16px 40px;
@@ -621,7 +796,9 @@ function goToImage(i: number) {
   transform: scale(1.05);
 }
 
-/* Explore blok */
+/* ==========================================================
+   🔎 EXPLORE SECTION
+========================================================== */
 #explore {
   padding: 30px 0;
   background: #651A1A;
@@ -639,7 +816,9 @@ function goToImage(i: number) {
   color: #F2EFE8;
 }
 
-/* Gallery */
+/* ==========================================================
+   🖼️ GALLERY GRID
+========================================================== */
 .gallery-grid {
   display: flex;
   gap: 25px;
@@ -653,10 +832,10 @@ function goToImage(i: number) {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   width: 380px;
+  height: 440px;
   display: flex;
   flex-direction: column;
   transition: 0.3s;
-  height: 440px;
 }
 
 .gallery-card img {
@@ -681,7 +860,9 @@ function goToImage(i: number) {
   cursor: pointer;
 }
 
-/* Why Gemistry */
+/* ==========================================================
+   💎 WHY GEMISTRY
+========================================================== */
 #why_gemistry {
   display: flex;
   flex-direction: column;
@@ -694,7 +875,9 @@ function goToImage(i: number) {
   font-size: 20px !important;
 }
 
-/* Gemistry family */
+/* ==========================================================
+   👨‍👩‍👧 GEMISTRY FAMILY
+========================================================== */
 #gemistry_family {
   padding: 0 40px;
   display: flex;
@@ -713,87 +896,387 @@ function goToImage(i: number) {
   border: 1px solid #651A1A;
 }
 
-/* Footer */
+/* ==========================================================
+   🦶 FOOTER SECTION
+========================================================== */
+
+/* --- General --- */
 footer {
-  color: white;
+  background: #f2efe8;
+  color: #651a1a;
   text-align: center;
-  margin-top: 60px;
-  font-size: 14px;
+  font-family: 'Didot', 'Playfair Display', 'Georgia', serif;
+  padding: 80px 20px 0;
 }
 
-/* Social media */
+/* --- Social Media --- */
 #social_media {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 40px;
-  padding: 60px 40px;
-  background-color: #F2EFE8;
-  color: #651A1A;
+  justify-content: center;
 }
 
-#social_media #left h3 {
-  font-size: 28px;
-  margin-bottom: 20px;
+#social_media h3 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: #651a1a;
 }
 
 #social_media_icons {
   display: flex;
-  gap: 40px;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 32px;
 }
 
 #social_media_icons img {
-  width: 50px;
-  height: 50px;
-  transition: transform 0.2s ease-in-out;
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
 }
 
 #social_media_icons img:hover {
-  transform: scale(1.2);
-  cursor: pointer;
+  transform: scale(1.1);
 }
 
+/* --- Contact Section --- */
+#contact_us {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px 0 50px;
+  border-top: 1px solid rgba(101, 26, 26, 0.15);
+}
+
+#contact_us h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #651a1a;
+  margin: 30px 0 20px;
+}
+
+#contact_us p {
+  font-size: 16px;
+  color: #4a3b3b;
+  line-height: 1.6;
+  margin: 8px 0;
+}
+
+#contact_us strong {
+  color: #651a1a;
+  font-weight: 700;
+}
+
+#contact_us a {
+  color: #651a1a;
+  text-decoration: underline;
+  transition: 0.3s ease;
+}
+
+#contact_us a:hover {
+  color: #a42c2c;
+  text-decoration-color: #a42c2c;
+}
+
+/* --- Contact Columns --- */
+.contact-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+@media (min-width: 768px) {
+  .contact-columns {
+    flex-direction: row;
+    justify-content: center;
+    gap: 40px;
+  }
+}
+
+/* --- Legal Bar --- */
 #footer_legal {
-  background-color: #651A1A;
-  color: white;
-  text-align: center;
-  padding: 20px;
+  background: #651a1a;
+  color: #f2efe8;
+  padding: 24px 10px;
+  font-family: 'Poppins', sans-serif;
   font-size: 14px;
+  border-top: 3px solid #501313;
+  letter-spacing: 0.3px;
 }
 
-/* ===== GEM POPUP ===== */
+#footer_legal p {
+  margin: 6px 0;
+}
+
+#footer_legal span {
+  text-decoration: underline;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+#footer_legal span:hover {
+  color: #fff;
+}
+
+#footer_legal span::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: #f2efe8;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
+#footer_legal span:hover::after {
+  transform: scaleX(1);
+}
+
+/* ==========================================================
+   💬 MODALS (Gemistry, Terms, Appointment, Blog)
+========================================================== */
+
+/* --- Overlay --- */
 .gem-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, .45);
+  background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
+  animation: fadeIn 0.3s ease;
 }
 
+/* --- Algemene voorwaarden / privacy modals --- */
+.voorwaarden-modal {
+  background: #fdfdfd;
+  border-radius: 18px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+  max-width: 900px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 40px 50px;
+  position: relative;
+  color: #333;
+  animation: popupSlide 0.4s ease;
+}
+
+.voorwaarden-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.voorwaarden-header h2 {
+  font-size: 28px;
+  color: #651a1a;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin: 0;
+}
+
+.gem-divider {
+  width: 60px;
+  height: 3px;
+  background: #f2efe8;
+  margin: 12px 0 20px 0;
+  border-radius: 2px;
+}
+
+.voorwaarden-content {
+  font-size: 16px;
+  line-height: 1.7;
+  text-align: left;
+  max-height: 65vh;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  padding-right: 10px;
+}
+
+/* Scrollbar verborgen */
+.voorwaarden-content::-webkit-scrollbar { width: 0; background: transparent; }
+.voorwaarden-content { scrollbar-width: none; -ms-overflow-style: none; }
+.voorwaarden-content::-webkit-scrollbar-thumb { background: transparent; }
+
+/* --- Tekststructuur --- */
+.voorwaarden-content h3 {
+  margin-top: 20px;
+  color: #651a1a;
+  font-size: 18px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.voorwaarden-content p { margin: 10px 0; }
+
+/* --- GEM POPUP ALGEMEEN --- */
 .gem-modal {
   background: #651A1A;
-  border-radius: 10px;
-  padding: 20px;
+  border-radius: 14px;
+  padding: 32px;
   width: 95%;
-  max-width: 800px;
-  height: 45vh;
+  max-width: 950px;
   color: #f2efe8;
+  animation: fadeIn 0.4s ease-out;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+  position: relative;
 }
 
+.gem-header {
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.gem-header h2 {
+  font-size: 30px;
+  font-weight: 700;
+  color: #f2efe8;
+  margin: 0;
+}
+
+/* --- Body layout --- */
+.gem-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+/* --- Tekstdeel links --- */
+.gem-copy {
+  flex: 1;
+  min-width: 260px;
+}
+
+.gem-copy p {
+  font-size: 16px;
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+
+.gem-cta {
+  background: #f2efe8;
+  color: #651A1A;
+  border: none;
+  padding: 10px 22px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.gem-cta:hover {
+  background: #fff;
+  transform: scale(1.05);
+}
+
+/* --- Afbeelding rechts --- */
+.gem-image-wrap {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.gem-image-wrap img {
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+/* --- Navigatiepijlen --- */
+.gem-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 0, 0.9);
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  z-index: 5;
+}
+
+.gem-nav:hover {
+  background: rgba(255, 255, 0, 1);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.gem-prev {
+  left: -20px;
+}
+
+.gem-next {
+  right: -20px;
+}
+
+/* --- Sluitknop --- */
 .gem-close {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  font-size: 26px;
+  right: 20px;
+  top: 18px;
+  font-size: 34px;
   background: none;
   border: none;
+  color: #f2efe8;
   cursor: pointer;
+  transition: color 0.2s ease;
+  line-height: 1;
+}
+.gem-close:hover { color: #fff; }
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .gem-body {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .gem-image-wrap img {
+    max-width: 80%;
+  }
+
+  .gem-nav {
+    width: 34px;
+    height: 34px;
+    font-size: 20px;
+  }
+
+  .gem-prev { left: 6px; }
+  .gem-next { right: 6px; }
+
+  .gem-divider {
+    margin: 10px auto 20px auto;
+  }
+
+  .gem-header { text-align: center; }
 }
 
-/* Appointment popup */
+
+/* ==========================================================
+   🕑 APPOINTMENT POPUP
+========================================================== */
 #appointment-popup .appointment-modal {
   width: min(1100px, 96vw);
   height: 80vh;
@@ -806,7 +1289,9 @@ footer {
   position: relative;
 }
 
-/* Blog Slider */
+/* ==========================================================
+   📰 BLOG SECTION & POPUPS
+========================================================== */
 .blog-slider {
   display: flex;
   align-items: center;
@@ -820,7 +1305,6 @@ footer {
   display: flex;
   background: #f2efe8;
   width: 900px;
-  height: auto;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   border-radius: 10px;
@@ -829,24 +1313,25 @@ footer {
   position: relative;
 }
 
-/* ==============================
-   BLOG POST HOVER EFFECT
-============================== */
-
-/* Cover image licht inzoomen bij hover */
+/* Hover effecten */
+.post:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
 .post:hover .post-image img {
   transform: scale(1.08);
   filter: brightness(0.85);
   transition: transform 0.4s ease, filter 0.4s ease;
 }
-
-/* Subtiele schaduwversterking en optische lift */
-.post:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+.post:hover::after {
+  opacity: 1;
+}
+.post:hover .post-text {
+  color: #111;
 }
 
-/* Extra overlay die verschijnt bij hover */
+/* Overlay effect */
 .post::after {
   content: "";
   position: absolute;
@@ -856,35 +1341,17 @@ footer {
   transition: opacity 0.3s ease;
   border-radius: 6px;
 }
-.post:hover::after {
-  opacity: 1;
-}
-
-/* Tekst subtiel donkerder of iets meer focus */
-.post:hover .post-text {
-  color: #111;
-  transition: color 0.3s ease;
-}
-
-/* Cursor + pointer */
-.post:hover {
-  cursor: pointer;
-}
-
 
 .post-image {
   flex: 0 0 50%;
   height: 100%;
   overflow: hidden;
 }
-
 .post-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
   transition: 0.3s;
-
 }
 
 .post-text {
@@ -906,6 +1373,7 @@ footer {
   margin: 15px 0;
 }
 
+/* Navigatie knoppen */
 .nav {
   background: #651a1a;
   color: white;
@@ -917,12 +1385,9 @@ footer {
   height: 50px;
   transition: 0.2s;
 }
+.nav:hover { background: #8a2a2a; }
 
-.nav:hover {
-  background: #8a2a2a;
-}
-
-/* Blog Popup */
+/* --- Blog Popup --- */
 .blog-modal-overlay {
   position: fixed;
   inset: 0;
@@ -955,7 +1420,7 @@ footer {
   cursor: pointer;
 }
 
-/* BLOG POPUP SLIDESHOW */
+/* --- Slideshow binnen blog popup --- */
 .blog-slider-popup {
   position: relative;
   width: 100%;
@@ -972,7 +1437,7 @@ footer {
   transition: opacity 0.4s ease-in-out;
 }
 
-/* Navigatiepijlen */
+/* --- Navigatiepijlen --- */
 .popup-nav {
   position: absolute;
   top: 50%;
@@ -987,21 +1452,14 @@ footer {
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
 }
-
 .popup-nav:hover {
   background: rgba(0, 0, 0, 0.7);
   transform: translateY(-50%) scale(1.05);
 }
+.popup-nav.left { left: 12px; }
+.popup-nav.right { right: 12px; }
 
-.popup-nav.left {
-  left: 12px;
-}
-
-.popup-nav.right {
-  right: 12px;
-}
-
-/* Bolletjes */
+/* --- Bolletjes indicatoren --- */
 .popup-dots {
   position: absolute;
   bottom: 12px;
@@ -1011,7 +1469,6 @@ footer {
   justify-content: center;
   gap: 8px;
 }
-
 .dot {
   width: 10px;
   height: 10px;
@@ -1020,52 +1477,67 @@ footer {
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
 }
-
 .dot.active {
   background: #fff;
   transform: scale(1.2);
 }
 
-/* Blog info popup */
+/* --- Blog info binnen popup --- */
 .blog-info {
   padding: 28px;
   background: #fff;
   color: #333;
 }
-
 .blog-info h2 {
   color: #651a1a;
   font-size: 32px;
   margin-bottom: 8px;
 }
-
 .blog-info .date {
   font-size: 14px;
   color: #888;
   margin-bottom: 10px;
 }
-
 .blog-info .text {
   font-size: 18px;
   line-height: 1.6;
 }
-
 .blog-info .extra {
   font-size: 16px;
   margin-top: 12px;
   color: #444;
 }
 
-/* Fade animatie */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
+/* ==========================================================
+   ⚙️ ANIMATIONS
+========================================================== */
+@keyframes slideIn {
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
   }
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes popupSlide {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Vue transitions */
+.popup-fade-enter-active,
+.popup-fade-leave-active {
+  transition: opacity 0.35s ease;
+}
+.popup-fade-enter-from,
+.popup-fade-leave-to {
+  opacity: 0;
+}
+
+
 </style>
 

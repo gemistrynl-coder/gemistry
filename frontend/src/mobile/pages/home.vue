@@ -2,12 +2,18 @@
   <div class="page">
     <main class="content">
       <!-- MAIN IMAGE -->
-      <div id="main_image">
-        <div id="main_image_div">
-          <p id="image_title">Your smile, your vibe,<br /> your color.</p>
-          <a href="/services"><button class="gem-cta">MAAK EEN AFSPRAAK</button></a>
+      <transition name="main-text" appear>
+        <div id="main_image" v-if="showTitle">
+          <div id="main_image_div">
+            <transition name="main-text" appear>
+              <p v-if="showTitle" id="image_title">Your smile, your vibe,<br /> your color.</p>
+            </transition>
+            <transition name="main-text" appear>
+              <a href="/services"><button class="gem-cta">MAAK EEN AFSPRAAK</button></a>
+            </transition>
+          </div>
         </div>
-      </div>
+      </transition>
 
       <!-- EXPLORE -->
       <div id="explore">
@@ -41,27 +47,33 @@
       </div>
 
       <!-- BLOG SLIDER -->
-      <div class="blog-slider" @touchstart="handleTouchStart" @touchend="handleTouchEnd">
+      <div
+          class="blog-slider"
+          @touchstart="handleTouchStart"
+          @touchend="handleTouchEnd"
+      >
         <button class="nav prev" @click="prevPost">‹</button>
 
-        <div
-            class="post"
-            v-for="(post, i) in visiblePosts"
-            :key="i"
-            @click="openBlogPopup(post)"
-        >
-          <div class="post-image">
-            <img :src="post.images[0]" alt="blog image" />
+        <transition name="blog-fade" mode="out-in">
+          <div
+              class="post"
+              :key="blogPosts[currentIndex].title"
+              @click="openBlogPopup(blogPosts[currentIndex])"
+          >
+            <div class="post-image">
+              <img :src="blogPosts[currentIndex].images[0]" alt="blog image" />
+            </div>
+            <div class="post-text">
+              <p class="post-title">{{ blogPosts[currentIndex].title }}</p>
+              <p class="post-body">{{ blogPosts[currentIndex].text }}</p>
+              <small>{{ blogPosts[currentIndex].date }}</small>
+            </div>
           </div>
-          <div class="post-text">
-            <p class="post-title">{{ post.title }}</p>
-            <p class="post-body">{{ post.text }}</p>
-            <small>{{ post.date }}</small>
-          </div>
-        </div>
+        </transition>
 
         <button class="nav next" @click="nextPost">›</button>
       </div>
+
 
       <div id="gemistry_family">
         <hr />
@@ -103,12 +115,15 @@
       </div>
 
       <div id="footer_legal">
-        <p>Privacy policy | Algemene voorwaarden</p>
+        <p>
+          <span @click="openVoorwaardenPopup">Algemene voorwaarden</span> |
+          <span @click="openPrivacyPopup">Privacy policy</span>
+        </p>
         <p>© 2025 Gemistry. Alle rechten voorbehouden.</p>
       </div>
     </footer>
 
-    <!-- ✅ FULLSCREEN POPUP MET SWIPE -->
+    <!-- POPUPS -->
     <transition name="popup-fade">
       <div
           v-if="showPopup"
@@ -149,90 +164,65 @@
         </div>
       </div>
     </transition>
+
+    <!-- Privacy & Voorwaarden -->
+    <transition name="popup-fade">
+      <div v-if="showVoorwaardenPopup" class="gem-modal-overlay">
+        <div class="popup-header">
+          <h2>Algemene voorwaarden</h2>
+          <button class="gem-close" @click="closeVoorwaardenPopup">×</button>
+        </div>
+        <div class="popup-content">
+          <p class="popup-text">
+            Dit zijn de algemene voorwaarden van Gemistry. Hierin staat informatie over afspraken,
+            betalingen, annuleringen en aansprakelijkheid. Door gebruik te maken van onze diensten
+            stemt u in met deze voorwaarden.
+          </p>
+        </div>
+      </div>
+    </transition>
+
+    <transition name="popup-fade">
+      <div v-if="showPrivacyPopup" class="gem-modal-overlay">
+        <div class="popup-header">
+          <h2>Privacy policy</h2>
+          <button class="gem-close" @click="closePrivacyPopup">×</button>
+        </div>
+        <div class="popup-content">
+          <p class="popup-text">
+            Wij hechten waarde aan uw privacy. Gemistry verwerkt uw gegevens uitsluitend om afspraken
+            te beheren en contact te onderhouden. We delen geen informatie met derden zonder uw toestemming.
+          </p>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 
-/* === POPUP SYSTEM MET SWIPE === */
-const showPopup = ref(false);
-const popupTitle = ref("");
-const popupText = ref("");
-const popupImages = ref<string[]>([]);
-const popupCTA = ref("");
-const currentImageIndex = ref(0);
-
-const openPopup = (title: string, text?: string, images?: string[] | string, cta?: string) => {
-  popupTitle.value = title;
-  popupText.value = text || "";
-  popupImages.value = Array.isArray(images) ? images : [images || ""];
-  popupCTA.value = cta || "";
-  currentImageIndex.value = 0;
-  showPopup.value = true;
-  document.body.style.overflow = "hidden";
-  document.documentElement.style.overflow = "hidden";
-};
-const closePopup = () => {
-  showPopup.value = false;
-  document.body.style.overflow = "";
-  document.documentElement.style.overflow = "";
-};
-const nextImage = () => {
-  if (popupImages.value.length > 1)
-    currentImageIndex.value = (currentImageIndex.value + 1) % popupImages.value.length;
-};
-const prevImage = () => {
-  if (popupImages.value.length > 1)
-    currentImageIndex.value =
-        (currentImageIndex.value - 1 + popupImages.value.length) % popupImages.value.length;
-};
-
-/* === Touch Controls Popup === */
-let touchStartXPopup = 0;
-let touchEndXPopup = 0;
-const handleTouchStartPopup = (e: TouchEvent) => (touchStartXPopup = e.changedTouches[0].screenX);
-const handleTouchEndPopup = (e: TouchEvent) => {
-  touchEndXPopup = e.changedTouches[0].screenX;
-  if (touchStartXPopup - touchEndXPopup > 50) nextImage();
-  if (touchEndXPopup - touchStartXPopup > 50) prevImage();
-};
-
-/* === GALLERY === */
-const gemModules = import.meta.glob("@/mobile/assets/img/gems/*.{png,jpg,jpeg,webp,JPG}", { eager: true });
-const gemImages = Object.values(gemModules).map((m: any) => m.default);
-const closeupModules = import.meta.glob("@/mobile/assets/img/closeup/*.{png,jpg,jpeg,webp,JPG}", { eager: true });
-const closeupImages = Object.values(closeupModules).map((m: any) => m.default);
-const galleryItems = ref([
-  { foto: gemImages[0], title: "GEMISTRY GEMS", popup: "gem" },
-  { foto: closeupImages[0], title: "CLOSE-UP VIEW", popup: "closeup" },
-  { foto: new URL("@/mobile/assets/img/random_image/IMG_4072.jpg", import.meta.url).href, title: "EVENTS", popup: "events" },
-]);
-const handleCardClick = (item: any) => {
-  if (item.popup === "gem")
-    openPopup("Gemistry’s Gems", "Onze klanten en modellen zijn het hart van ons merk...", gemImages, "/services");
-  else if (item.popup === "closeup")
-    openPopup("Close-up View", "Details make the difference...", closeupImages, "/services");
-  else openPopup(item.title, "Coming soon...");
-};
-
-/* === BLOG – DYNAMISCH === */
+/* === BLOG POSTS DYNAMISCH LADEN === */
 interface BlogPost {
   title: string;
   text: string;
   date: string;
   images: string[];
-  extra?: string;
 }
+
 const blogPosts = ref<BlogPost[]>([]);
+const showTitle = ref(false)
 
-// Laad alle JSON-data
-const blogFolders = import.meta.glob("@/mobile/assets/blog/*/post.json", { eager: true, import: "default" });
+// Laad JSON + Afbeeldingen uit blog-map
+const blogFolders = import.meta.glob("@/mobile/assets/blog/*/post.json", {
+  eager: true,
+  import: "default",
+});
+const allGalleryModules = import.meta.glob(
+    "@/mobile/assets/blog/**/gallery/*.{jpg,jpeg,png,webp,JPG}",
+    { eager: true }
+);
 
-// Laad alle gallery-afbeeldingen tegelijk
-const allGalleryModules = import.meta.glob("@/mobile/assets/blog/**/gallery/*.{jpg,jpeg,png,webp,JPG}", { eager: true });
-
-// Combineer data
 for (const path in blogFolders) {
   const folder = path.replace("/post.json", "");
   const postData = blogFolders[path] as Omit<BlogPost, "images">;
@@ -240,15 +230,21 @@ for (const path in blogFolders) {
   const galleryImages = Object.entries(allGalleryModules)
       .filter(([imgPath]) => imgPath.startsWith(folder))
       .map(([_, mod]: any) => mod.default);
-  blogPosts.value.push({ ...postData, images: [mainImg, ...galleryImages] });
+
+  blogPosts.value.push({
+    ...postData,
+    images: [mainImg, ...galleryImages],
+  });
 }
+
 blogPosts.value.sort((a, b) => (a.date < b.date ? 1 : -1));
 
-/* === BLOG SLIDER & SWIPE === */
+/* === SLIDER === */
 const currentIndex = ref(0);
 const visiblePosts = computed(() => [blogPosts.value[currentIndex.value]]);
 const nextPost = () => (currentIndex.value = (currentIndex.value + 1) % blogPosts.value.length);
 const prevPost = () => (currentIndex.value = (currentIndex.value - 1 + blogPosts.value.length) % blogPosts.value.length);
+
 let touchStartX = 0;
 let touchEndX = 0;
 const handleTouchStart = (e: TouchEvent) => (touchStartX = e.changedTouches[0].screenX);
@@ -257,110 +253,176 @@ const handleTouchEnd = (e: TouchEvent) => {
   if (touchStartX - touchEndX > 50) nextPost();
   if (touchEndX - touchStartX > 50) prevPost();
 };
-const openBlogPopup = (post: any) =>
-    openPopup(post.title, post.text, post.images, "/services");
+
+/* === POPUP === */
+const showPopup = ref(false);
+const popupTitle = ref("");
+const popupText = ref("");
+const popupImages = ref<string[]>([]);
+const popupCTA = ref("");
+const currentImageIndex = ref(0);
+
+const openBlogPopup = (post: any) => {
+  popupTitle.value = post.title;
+  popupText.value = post.text;
+  popupImages.value = post.images || [];
+  popupCTA.value = "/services";
+  showPopup.value = true;
+};
+
+const closePopup = () => (showPopup.value = false);
+const nextImage = () =>
+    (currentImageIndex.value = (currentImageIndex.value + 1) % popupImages.value.length);
+const prevImage = () =>
+    (currentImageIndex.value =
+        (currentImageIndex.value - 1 + popupImages.value.length) % popupImages.value.length);
+const handleTouchStartPopup = (e: TouchEvent) => (touchStartX = e.changedTouches[0].screenX);
+const handleTouchEndPopup = (e: TouchEvent) => {
+  touchEndX = e.changedTouches[0].screenX;
+  if (touchStartX - touchEndX > 50) nextImage();
+  if (touchEndX - touchStartX > 50) prevImage();
+};
+
+/* === FOOTER POPUPS === */
+const showVoorwaardenPopup = ref(false);
+const showPrivacyPopup = ref(false);
+const openVoorwaardenPopup = () => (showVoorwaardenPopup.value = true);
+const closeVoorwaardenPopup = () => (showVoorwaardenPopup.value = false);
+const openPrivacyPopup = () => (showPrivacyPopup.value = true);
+const closePrivacyPopup = () => (showPrivacyPopup.value = false);
+
+/* === GALLERY === */
+const gemModules = import.meta.glob("@/mobile/assets/img/gems/*.{png,jpg,jpeg,webp,JPG}", { eager: true });
+const gemImages = Object.values(gemModules).map((m: any) => m.default);
+const closeupModules = import.meta.glob("@/mobile/assets/img/closeup/*.{png,jpg,jpeg,webp,JPG}", { eager: true });
+const closeupImages = Object.values(closeupModules).map((m: any) => m.default);
+
+const galleryItems = ref([
+  { foto: gemImages[0], title: "GEMISTRY GEMS", popup: "gem" },
+  { foto: closeupImages[0], title: "CLOSE-UP VIEW", popup: "closeup" },
+  {
+    foto: new URL("@/mobile/assets/img/random_image/IMG_4072.jpg", import.meta.url).href,
+    title: "EVENTS",
+    popup: "events",
+  },
+]);
+
+const handleCardClick = (item: any) => {
+  if (item.popup === "gem")
+    openBlogPopup({
+      title: "Gemistry’s Gems",
+      text: "Onze klanten en modellen zijn het hart van ons merk...",
+      images: gemImages,
+    });
+  else if (item.popup === "closeup")
+    openBlogPopup({
+      title: "Close-up View",
+      text: "Details make the difference...",
+      images: closeupImages,
+    });
+  else openBlogPopup({ title: item.title, text: "Coming soon...", images: [] });
+};
+
+
+onMounted(() => {
+  showTitle.value = true
+})
 </script>
 
-
-
 <style scoped>
-/* === BASIS === */
 .page {
   width: 100%;
-  background-color: #f2efe8;
+  background: #f2efe8;
   overflow-x: hidden;
 }
 
-/* === MAIN IMAGE === */
+/* MAIN IMAGE */
 #main_image {
   height: 100svh;
   background: url("../assets/img/main/image1.jpeg") center center / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-#main_image_div {
   text-align: center;
 }
 #image_title {
-  color: #f2efe8;
-  font-size: 66px;
+  color: #fff;
+  font-size: 58px;
   font-family: 'Vogue';
-  margin: 0 10px 20px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  padding: 0 16px;
 }
-#main_image_div button {
-  font-size: 20px;
+.gem-cta {
+  font-size: 18px;
   padding: 12px 28px;
   background: transparent;
-  border: 2px solid #f2efe8;
-  color: #f2efe8;
+  border: 2px solid #fff;
+  color: #fff;
   border-radius: 6px;
-  cursor: pointer;
   transition: 0.3s;
 }
-#main_image_div button:hover {
-  background: #f2efe8;
+.gem-cta:hover {
+  background: #fff;
   color: #651a1a;
 }
 
-/* === EXPLORE === */
+/* EXPLORE */
 #explore {
   background: #651a1a;
-  color: #f2efe8;
+  color: #fff;
   text-align: center;
   padding: 40px 10px;
-}
-#explore p {
-  font-size: 32px;
-  margin-bottom: 20px;
 }
 .gallery-grid {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 25px;
-  margin-bottom: 40px;
 }
 .gallery-card {
-  background: #f2efe8;
+  background: #fff;
   border-radius: 15px;
   width: 90%;
   max-width: 360px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
   transition: 0.3s;
+}
+
+.gallery-card h3{
+  color: #651a1a;
+}
+
+.gallery-card:hover {
+  transform: scale(1.03);
 }
 .gallery-card img {
   width: 100%;
   height: 300px;
   object-fit: cover;
 }
-.gallery-card h3 {
-  color: #651a1a;
-  margin: 10px;
-  font-size: 22px;
-  font-weight: bold;
-}
-.gallery-card:active {
-  transform: scale(0.97);
-}
 
-/* === BLOG SLIDER === */
+/* BLOG */
 .blog-slider {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   margin: 40px auto;
+  gap: 8px;
   width: 100%;
   max-width: 420px;
 }
 .post {
-  background: #f2efe8;
+  background: #fff;
   border-radius: 10px;
   overflow: hidden;
   width: 100%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: opacity 0.4s ease;
+  cursor: pointer;
+}
+.post:hover {
+  transform: translateY(-3px);
 }
 .post-image img {
   width: 100%;
@@ -369,12 +431,17 @@ const openBlogPopup = (post: any) =>
 }
 .post-text {
   padding: 16px;
-  color: #333;
 }
 .post-title {
-  font-size: 22px;
   font-weight: bold;
-  margin-bottom: 8px;
+  font-size: 22px;
+  margin-bottom: 6px;
+  color: #651a1a;
+}
+.post-body {
+  font-size: 15px;
+  color: #4a3b3b;
+  line-height: 1.4;
 }
 .nav {
   background: #651a1a;
@@ -384,214 +451,287 @@ const openBlogPopup = (post: any) =>
   width: 44px;
   height: 44px;
   font-size: 24px;
-  cursor: pointer;
 }
 
-/* === FOOTER === */
+/* FOOTER */
+/* === FOOTER MODERN LOOK === */
 footer {
-  text-align: center;
   background: #f2efe8;
   color: #651a1a;
+  font-family: 'Didot', 'Playfair Display', 'Georgia', serif;
+  text-align: center;
+}
+
+/* Socials */
+#social_media h3 {
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: none;
+  color: #651a1a;
+  margin-bottom: 12px;
+}
+
+#social_media_icons {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: 28px;
 }
 #social_media_icons img {
-  width: 40px;
-  height: 40px;
-  margin: 0 10px;
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2));
+  transition: 0.3s ease;
 }
+#social_media_icons img:hover {
+  transform: scale(1.08);
+}
+
+/* Contact section */
+#contact_us h2 {
+  font-size: 22px;
+  margin-bottom: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+  color: #651a1a;
+}
+
+#contact_us p {
+  font-size: 16px;
+  color: #4a3b3b;
+  margin: 6px 0;
+  line-height: 1.5;
+}
+
+#contact_us strong {
+  color: #651a1a;
+}
+
+.contact-columns {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+#contact_us a {
+  color: #651a1a;
+  font-weight: 600;
+  text-decoration: underline;
+  transition: 0.3s;
+}
+#contact_us a:hover {
+  color: #a42c2c;
+}
+
+/* Footer legal strip */
+#footer_legal {
+  background: #651a1a;
+  color: #fff;
+  padding: 24px 16px;
+  margin-top: 20px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  width: 100%;
+}
+
+#footer_legal span {
+  cursor: pointer;
+  text-decoration: underline;
+  margin: 0 6px;
+  transition: 0.2s ease;
+}
+#footer_legal span:hover {
+  color: #f2efe8;
+}
+#footer_legal p {
+  margin: 6px 0;
+}
+
+/* Responsive touch */
+@media (min-width: 768px) {
+  #contact_us p {
+    font-size: 17px;
+  }
+  #footer_legal {
+    font-size: 15px;
+  }
+}
+
+
 #footer_legal {
   background: #651a1a;
   color: #fff;
   padding: 20px;
 }
+#footer_legal span {
+  cursor: pointer;
+  text-decoration: underline;
+}
 
-/* === FULLSCREEN POPUP (LUXE STIJL) === */
+/* === BLOG MODAL === */
 .gem-modal-overlay {
   position: fixed;
   inset: 0;
   background: #f2efe8;
-  z-index: 9999;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: center;
-  overflow: hidden;
-  width: 100vw;
-  height: 100svh;
-  padding: 24px 0 40px;
+  z-index: 9999;
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+
+.popup-header {
+  width: 100%;
+  text-align: center;
+  position: relative;
+  margin-top: 30px;
+  padding: 0 56px 0 24px; /* ← meer ruimte rechts */
   box-sizing: border-box;
 }
 
-/* === HEADER MET TITEL EN SLUITKNOP === */
-.popup-header {
-  width: 100%;
-  max-width: 800px;
-  padding: 0 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  margin-bottom: 12px;
+.popup-header h2 {
+  font-size: 26px;
+  color: #651a1a;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.3;
+  word-break: break-word; /* voorkomt overlap bij lange titels */
 }
 
-.popup-header h2 {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 30px;
-  font-weight: 700;
-  color: #651a1a;
-  text-align: center;
-  margin: 0;
-  line-height: 1.3;
-  letter-spacing: 0.3px;
-}
 
 .gem-close {
   position: absolute;
-  right: 24px;
-  top: 2px;
-  font-size: 30px;
-  color: #651a1a;
+  right: 20px;
+  top: 8px;
+  font-size: 34px;
   background: none;
   border: none;
+  color: #651a1a;
   cursor: pointer;
-  transition: all 0.25s ease;
-}
-.gem-close:hover {
-  transform: scale(1.15);
-  color: #9b2e2e;
+  line-height: 1;
 }
 
-/* === CONTENT === */
+/* popup content */
 .popup-content {
-  flex: 1;
-  width: 100%;
-  max-width: 800px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
-  text-align: center;
+  margin-top: 16px;
+  padding: 0 16px;
 }
-
-/* === FOTO === */
 .popup-image {
-  width: 94%;
-  max-width: 800px;
-  height: auto;
-  border-radius: 22px;
+  width: 92%;
+  max-width: 640px;
+  border-radius: 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
   object-fit: cover;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  margin: 0 auto 20px;
-  transition: all 0.4s ease;
 }
 
-/* === NAVIGATIE KNOPPEN === */
+/* navigation buttons */
 .nav-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(101, 26, 26, 0.9);
-  color: white;
+  background: rgba(101, 26, 26, 0.8);
+  color: #fff;
   border: none;
   border-radius: 50%;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   font-size: 26px;
   cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: all 0.3s ease;
-}
-.nav-btn.prev {
-  left: 6%;
-}
-.nav-btn.next {
-  right: 6%;
+  transition: 0.3s;
 }
 .nav-btn:hover {
-  background: #7a2222;
-  transform: translateY(-50%) scale(1.1);
+  background: #651a1a;
+}
+.nav-btn.prev {
+  left: 12px;
+}
+.nav-btn.next {
+  right: 12px;
 }
 
-/* === DOTS INDICATOREN === */
+/* image dots */
 .dot-container {
   display: flex;
-  justify-content: center;
   gap: 8px;
-  margin: 12px 0 20px;
+  margin-top: 6px;
+  margin-bottom: 16px;
 }
 .dot {
-  width: 9px;
-  height: 9px;
-  background: #c4bdb4;
+  width: 10px;
+  height: 10px;
+  background: #ccc;
   border-radius: 50%;
-  transition: background 0.25s ease;
 }
 .dot.active {
   background: #651a1a;
 }
 
-/* === TEKST === */
+/* text */
 .popup-text {
-  font-size: 17px;
-  font-style: italic;
+  font-size: 16px;
   color: #4a3b3b;
   text-align: center;
-  max-width: 620px;
-  margin: 0 auto 15px;
-  line-height: 1.6;
-  padding: 0 16px;
+  max-width: 700px;
+  line-height: 1.7;
+  margin-top: 10px;
+  padding: 0 18px;
 }
 
-/* === CTA KNOP === */
-.gem-cta {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  padding: 12px 28px;
-  border-radius: 25px;
-  background: #7a2222;
+/* CTA button inside modal */
+.popup-content .gem-cta {
+  margin-top: 24px;
+  background: transparent;
+  border: 2px solid #651a1a;
+  color: #651a1a;
+  transition: 0.3s;
+}
+.popup-content .gem-cta:hover {
+  background: #651a1a;
   color: #fff;
-  border: none;
-  font-weight: 600;
-  font-size: 15px;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.gem-cta:hover {
-  background: #9b2e2e;
-  transform: translateY(-2px);
 }
 
-/* === FADE TRANSITIE === */
+/* FADE ANIMATIONS */
 .popup-fade-enter-active,
-.popup-fade-leave-active {
-  transition: opacity 0.35s ease;
+.popup-fade-leave-active,
+.blog-fade-enter-active,
+.blog-fade-leave-active {
+  transition: opacity 0.6s ease;
 }
 .popup-fade-enter-from,
-.popup-fade-leave-to {
+.popup-fade-leave-to,
+.blog-fade-enter-from,
+.blog-fade-leave-to {
+  opacity: 0;
+}
+.main-text-enter-active,
+.main-text-leave-active {
+  transition: opacity 0.6s ease;
+}
+.main-text-enter-from,
+.main-text-leave-to {
   opacity: 0;
 }
 
-/* === RESPONSIVE === */
-@media (max-width: 600px) {
+/* === Responsive modal === */
+@media (min-width: 768px) {
   .popup-header h2 {
-    font-size: 22px;
+    font-size: 32px;
   }
   .popup-image {
-    width: 92%;
-    border-radius: 18px;
-  }
-  .nav-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 22px;
+    width: 80%;
   }
   .popup-text {
-    font-size: 15px;
+    font-size: 17px;
   }
 }
-
 
 </style>
