@@ -90,8 +90,8 @@
                 <p><strong>Address</strong><br />Amsterdam Zuid</p>
               </div>
               <div class="contact-col">
-                <p><strong>Didi Zeilstra</strong><br />KvK: 97986178<br />Btw: NL005301771B83</p>
-                <p><strong>Dean Davies</strong><br />KvK: 97986178<br />Btw: NL005301771B83</p>
+                <p><strong>Didi Zeilstra</strong><br />KvK: 97986178<br /></p>
+                <p><strong>Dean Davies</strong><br />KvK: 98163221<br /></p>
               </div>
             </div>
             <p style="margin-top: 20px">
