@@ -373,41 +373,72 @@ interface BlogPost {
   images: string[];
 }
 
+// Reactive state
 const blogPosts = ref<BlogPost[]>([]);
-const showTitle = ref(false)
+const showTitle = ref(false);
 
-// Laad JSON + Afbeeldingen uit blog-map
+/* === BLOG LOAD FIX ===
+   Vite’s build op Railway heeft soms moeite met `new URL(..., import.meta.url)`.
+   Daarom laden we de main images en gallery via import.meta.glob met eager import,
+   zodat de bestanden tijdens build gebundeld worden in de public assets.
+*/
+
+// Laad JSON posts
 const blogFolders = import.meta.glob("@/mobile/assets/blog/*/post.json", {
   eager: true,
   import: "default",
 });
-const allGalleryModules = import.meta.glob(
-    "@/mobile/assets/blog/**/gallery/*.{jpg,jpeg,png,webp,JPG}",
+
+// Laad alle blogafbeeldingen (inclusief main.jpg / main.png)
+const blogImages = import.meta.glob(
+    "@/mobile/assets/blog/**/*.{jpg,jpeg,png,webp,JPG}",
     { eager: true }
 );
 
+// Combineer per blogmap
 for (const path in blogFolders) {
-  const folder = path.replace("/post.json", "");
+  const folderPath = path.replace("/post.json", "");
   const postData = blogFolders[path] as Omit<BlogPost, "images">;
-  const mainImg = new URL(`${folder}/main.jpg`, import.meta.url).href;
-  const galleryImages = Object.entries(allGalleryModules)
-      .filter(([imgPath]) => imgPath.startsWith(folder))
+
+  // Zoek alle afbeeldingen binnen deze map
+  const images = Object.entries(blogImages)
+      .filter(([imgPath]) => imgPath.startsWith(folderPath))
       .map(([_, mod]: any) => mod.default);
+
+  // Sorteer zodat main.jpg eerst komt
+  const sortedImages = images.sort((a, b) => {
+    const aMain = a.includes("main");
+    const bMain = b.includes("main");
+    return aMain === bMain ? 0 : aMain ? -1 : 1;
+  });
 
   blogPosts.value.push({
     ...postData,
-    images: [mainImg, ...galleryImages],
+    images: sortedImages,
   });
 }
 
+// Sorteer posts op datum (nieuwste bovenaan)
 blogPosts.value.sort((a, b) => (a.date < b.date ? 1 : -1));
 
-/* === SLIDER === */
+/* === BLOG SLIDER === */
 const currentIndex = ref(0);
 const visiblePosts = computed(() => [blogPosts.value[currentIndex.value]]);
-const nextPost = () => (currentIndex.value = (currentIndex.value + 1) % blogPosts.value.length);
-const prevPost = () => (currentIndex.value = (currentIndex.value - 1 + blogPosts.value.length) % blogPosts.value.length);
 
+const nextPost = () => {
+  if (blogPosts.value.length > 0) {
+    currentIndex.value = (currentIndex.value + 1) % blogPosts.value.length;
+  }
+};
+
+const prevPost = () => {
+  if (blogPosts.value.length > 0) {
+    currentIndex.value =
+        (currentIndex.value - 1 + blogPosts.value.length) % blogPosts.value.length;
+  }
+};
+
+/* === TOUCH NAVIGATIE === */
 let touchStartX = 0;
 let touchEndX = 0;
 const handleTouchStart = (e: TouchEvent) => (touchStartX = e.changedTouches[0].screenX);
@@ -417,7 +448,7 @@ const handleTouchEnd = (e: TouchEvent) => {
   if (touchEndX - touchStartX > 50) prevPost();
 };
 
-/* === POPUP === */
+/* === BLOG POPUP === */
 const showPopup = ref(false);
 const popupTitle = ref("");
 const popupText = ref("");
@@ -434,12 +465,23 @@ const openBlogPopup = (post: any) => {
 };
 
 const closePopup = () => (showPopup.value = false);
-const nextImage = () =>
-    (currentImageIndex.value = (currentImageIndex.value + 1) % popupImages.value.length);
-const prevImage = () =>
-    (currentImageIndex.value =
-        (currentImageIndex.value - 1 + popupImages.value.length) % popupImages.value.length);
-const handleTouchStartPopup = (e: TouchEvent) => (touchStartX = e.changedTouches[0].screenX);
+const nextImage = () => {
+  if (popupImages.value.length > 0) {
+    currentImageIndex.value =
+        (currentImageIndex.value + 1) % popupImages.value.length;
+  }
+};
+const prevImage = () => {
+  if (popupImages.value.length > 0) {
+    currentImageIndex.value =
+        (currentImageIndex.value - 1 + popupImages.value.length) %
+        popupImages.value.length;
+  }
+};
+
+/* === TOUCH NAVIGATIE IN POPUP === */
+const handleTouchStartPopup = (e: TouchEvent) =>
+    (touchStartX = e.changedTouches[0].screenX);
 const handleTouchEndPopup = (e: TouchEvent) => {
   touchEndX = e.changedTouches[0].screenX;
   if (touchStartX - touchEndX > 50) nextImage();
@@ -455,9 +497,16 @@ const openPrivacyPopup = () => (showPrivacyPopup.value = true);
 const closePrivacyPopup = () => (showPrivacyPopup.value = false);
 
 /* === GALLERY === */
-const gemModules = import.meta.glob("@/mobile/assets/img/gems/*.{png,jpg,jpeg,webp,JPG}", { eager: true });
+const gemModules = import.meta.glob(
+    "@/mobile/assets/img/gems/*.{png,jpg,jpeg,webp,JPG}",
+    { eager: true }
+);
 const gemImages = Object.values(gemModules).map((m: any) => m.default);
-const closeupModules = import.meta.glob("@/mobile/assets/img/closeup/*.{png,jpg,jpeg,webp,JPG}", { eager: true });
+
+const closeupModules = import.meta.glob(
+    "@/mobile/assets/img/closeup/*.{png,jpg,jpeg,webp,JPG}",
+    { eager: true }
+);
 const closeupImages = Object.values(closeupModules).map((m: any) => m.default);
 
 const galleryItems = ref([
@@ -470,6 +519,7 @@ const galleryItems = ref([
   },
 ]);
 
+/* === GALLERY CLICK HANDLER === */
 const handleCardClick = (item: any) => {
   if (item.popup === "gem")
     openBlogPopup({
@@ -483,14 +533,20 @@ const handleCardClick = (item: any) => {
       text: "Details make the difference...",
       images: closeupImages,
     });
-  else openBlogPopup({ title: item.title, text: "Coming soon...", images: [] });
+  else
+    openBlogPopup({
+      title: item.title,
+      text: "Coming soon...",
+      images: [],
+    });
 };
 
-
+/* === INIT ANIMATIES === */
 onMounted(() => {
-  showTitle.value = true
-})
+  showTitle.value = true;
+});
 </script>
+
 
 <style scoped>
 .page {
