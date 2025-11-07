@@ -384,7 +384,7 @@
               We zijn continu op zoek naar mensen die ons merk
               willen vertegenwoordigen en onderdeel willen
               worden van de Gemistry fam. Door samen te
-              werken met modellen en creators kunnen we laten
+8              werken met modellen en creators kunnen we laten
               zien dat toothgems meer zijn dan een accessoire,
               het is een lifestyle, een vibe, een statement.
               Een deel van onze foto’s is prachtig vastgelegd
@@ -460,25 +460,46 @@
     </div>
 
 
-    <!-- APPOINTMENT POPUP -->
+    <!-- === EVENTS POPUP === -->
     <div
-        id="appointment-popup"
+        v-if="showEventsPopup"
         class="gem-modal-overlay"
-        v-show="showAppointmentPopup"
-        @click.self="closeAppointmentPopup"
+        id="events-overlay"
+        @click.self="showEventsPopup = false"
     >
-      <div class="appointment-modal">
-        <button class="gem-close" @click="closeAppointmentPopup" aria-label="Sluiten">×</button>
-        <div class="gem-header">
-          <h2>Plan een afspraak</h2>
-          <div class="gem-divider"></div>
-        </div>
-        <div class="gem-body">
-          <p>Kies hieronder eenvoudig een tijdslot dat jou het beste uitkomt.</p>
-          <div class="calendly-inline-widget" data-url="https://calendly.com/gemistrynl/2-gems"></div>
+      <div class="events-modal">
+        <button
+            class="gem-close"
+            aria-label="Sluiten"
+            @click="showEventsPopup = false"
+        >×</button>
+
+        <div class="events-layout">
+          <!-- 🧾 LEFT: Event list -->
+          <div class="events-list">
+            <h2>Upcoming Events</h2>
+            <ul>
+              <li class="active">Gemistry</li>
+            </ul>
+          </div>
+
+          <!-- 📸 RIGHT: Images + Text -->
+          <div class="events-content">
+            <div class="events-gallery">
+              <div class="gallery-scroll">
+                Coming soon!
+              </div>
+            </div>
+
+            <div class="events-description">
+              <h3>Gemistry</h3>
+              <p>No events yet.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -506,6 +527,8 @@ const showCloseupPopup = ref(false);
 const showVoorwaardenPopup = ref(false);
 const showPrivacyPopup = ref(false);
 const showBlogPopup = ref(false);
+const showEventsPopup = ref(false);
+
 
 // ==============================
 // SCROLL LOCK
@@ -637,9 +660,7 @@ type GalleryItem = { popup?: string };
 const handleCardClick = (item: GalleryItem) => {
   if (item.popup === "gem") return openGemPopup();
   if (item.popup === "closeup") return openCloseupPopup();
-  if (item.popup === "events") {
-    // eventueel events-popup toevoegen
-  }
+  if (item.popup === "events") {  showEventsPopup.value = true;  }
 };
 
 // ==============================
@@ -1236,7 +1257,7 @@ footer {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 0, 0.9);
+  background: rgb(242, 239, 232);
   color: #000;
   border: none;
   border-radius: 50%;
@@ -1249,7 +1270,7 @@ footer {
 }
 
 .gem-nav:hover {
-  background: rgba(255, 255, 0, 1);
+  background: rgb(242, 239, 232);
   transform: translateY(-50%) scale(1.1);
 }
 
@@ -1566,6 +1587,186 @@ footer {
 .popup-fade-enter-from,
 .popup-fade-leave-to {
   opacity: 0;
+}
+
+
+/* === EVENT POPUP === */
+#events-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+.events-modal {
+  background: #651a1a;
+  color: #f2efe8;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  width: 90%;
+  max-width: 1100px;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  animation: popupSlide 0.4s ease-out;
+}
+
+/* Close button */
+.events-modal .gem-close {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  font-size: 34px;
+  color: #f2efe8;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.events-modal .gem-close:hover {
+  color: #fff;
+}
+
+/* Main layout */
+.events-layout {
+  display: flex;
+  height: 100%;
+  gap: 0;
+}
+
+/* LEFT SIDE */
+.events-list {
+  width: 30%;
+  background: #7a2a2a;
+  padding: 40px 25px;
+  display: flex;
+  flex-direction: column;
+  border-right: 2px solid rgba(242, 239, 232, 0.1);
+  overflow-y: auto;
+}
+
+.events-list h2 {
+  font-family: "Vogue";
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.events-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.events-list li {
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  background: rgba(242, 239, 232, 0.1);
+  transition: background 0.3s ease;
+}
+.events-list li:hover {
+  background: rgba(242, 239, 232, 0.25);
+}
+.events-list li.active {
+  background: #f2efe8;
+  color: #651a1a;
+  font-weight: bold;
+}
+
+/* RIGHT SIDE */
+.events-content {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 30px;
+  overflow: hidden;
+}
+
+/* Scrollable gallery */
+.events-gallery {
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.25);
+  margin-bottom: 20px;
+}
+
+.gallery-scroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 10px;
+}
+
+.gallery-scroll img {
+  height: 280px;
+  width: auto;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease;
+}
+.gallery-scroll img:hover {
+  transform: scale(1.05);
+}
+
+/* Text below */
+.events-description {
+  background: rgba(242, 239, 232, 0.15);
+  padding: 20px 25px;
+  border-radius: 10px;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+.events-description h3 {
+  margin-bottom: 10px;
+  font-size: 22px;
+  color: #fff;
+}
+
+.events-description p {
+  color: #f2efe8;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .events-layout {
+    flex-direction: column;
+  }
+
+  .events-list {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: none;
+    border-bottom: 2px solid rgba(242, 239, 232, 0.1);
+  }
+
+  .events-list ul {
+    display: flex;
+    gap: 10px;
+  }
+
+  .events-content {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .gallery-scroll img {
+    height: 200px;
+  }
 }
 
 
