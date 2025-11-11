@@ -183,12 +183,16 @@ function formatType(type) {
   }
 }
 function safeParseItems(maybe) {
+  if (Array.isArray(maybe)) return maybe;
+  if (maybe == null || maybe === "") return [];
   try {
-    return Array.isArray(maybe) ? maybe : JSON.parse(maybe || "[]");
+    const parsed = typeof maybe === "string" ? JSON.parse(maybe) : maybe;
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
 }
+
 function hasPrijs(p) {
   return p !== null && p !== undefined && p !== "";
 }

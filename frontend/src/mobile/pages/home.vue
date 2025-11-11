@@ -165,6 +165,67 @@
       </div>
     </transition>
 
+
+
+
+
+
+
+    <transition name="popup-fade" id="event-popup">
+      <div v-if="showEventsPopup" class="gem-modal-overlay">
+        <div class="popup-header">
+          <h2>EVENTS</h2>
+          <button class="gem-close" @click="closeEventsPopup">×</button>
+        </div>
+
+        <!-- 🟥 DROPDOWN -->
+        <div class="events-dropdown">
+          <select v-model="selectedEventTitle" class="event-select">
+            <option
+                v-for="ev in events"
+                :key="ev.title"
+                :value="ev.title"
+                :class="{ past: ev.isPast }"
+            >
+              {{ ev.date }} — {{ ev.title }}
+            </option>
+          </select>
+        </div>
+
+        <!-- 🟩 MAIN FOTO -->
+        <div v-if="currentEvent" class="events-main">
+          <img
+              :src="currentEvent.images[eventCurrentIndex]"
+              class="event-main-img"
+              alt="event main"
+          />
+        </div>
+
+        <!-- ⬛ CARROUSEL (fixed bottom) -->
+        <div
+            v-if="currentEvent && currentEvent.images.length > 1"
+            class="events-carousel-fixed"
+        >
+          <button class="carousel-btn" @click="eventPrevImage">‹</button>
+          <div class="carousel-track">
+            <img
+                v-for="(img, i) in currentEvent.images"
+                :key="i"
+                :src="img"
+                class="carousel-thumb"
+                :class="{ selected: i === eventCurrentIndex }"
+                @click="eventCurrentIndex = i"
+            />
+          </div>
+          <button class="carousel-btn" @click="eventNextImage">›</button>
+        </div>
+
+      </div>
+    </transition>
+
+
+
+
     <!-- === ALGEMENE VOORWAARDEN POPUP === -->
     <transition name="popup-fade">
       <div v-if="showVoorwaardenPopup" class="gem-modal-overlay" @click.self="closeVoorwaardenPopup">
@@ -365,6 +426,97 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 
+
+/* === EVENTS POPUP (unieke variabelen) === */
+interface EventItem {
+  date: string
+  title: string
+  images: string[]
+  isPast: boolean
+}
+
+const showEventsPopup = ref(false)
+const openEventsPopup = () => (showEventsPopup.value = true)
+const closeEventsPopup = () => (showEventsPopup.value = false)
+
+const eventFolders = import.meta.glob('@/desktop/assets/events/*/*.{jpg,jpeg,png,webp}', {
+  eager: true,
+})
+
+const eventMap: Record<string, string[]> = {}
+
+for (const path in eventFolders) {
+  const match = path.match(/events\/([^/]+)\//)
+  if (match) {
+    const folderName = match[1]
+    if (!eventMap[folderName]) eventMap[folderName] = []
+    // @ts-ignore
+    eventMap[folderName].push(eventFolders[path].default)
+  }
+}
+
+const today = new Date()
+const events = Object.entries(eventMap)
+    .map(([folder, imgs]) => {
+      const [dateStr, title] = folder.split('_')
+      const [day, month, year] = dateStr.split('-').map(Number)
+      const eventDate = new Date(year, month - 1, day)
+      return {
+        date: dateStr,
+        title,
+        images: imgs,
+        isPast: eventDate < today,
+      }
+    })
+    .sort((a, b) => {
+      const [da, ma, ya] = a.date.split('-').map(Number)
+      const [db, mb, yb] = b.date.split('-').map(Number)
+      return new Date(ya, ma - 1, da).getTime() - new Date(yb, mb - 1, db).getTime()
+    })
+
+const nextEvent = events.find(e => !e.isPast)
+const selectedEventTitle = ref(nextEvent ? nextEvent.title : events[0]?.title || '')
+const currentEvent = computed(() => events.find(e => e.title === selectedEventTitle.value))
+const eventCurrentIndex = ref(0)
+
+const eventNextImage = () => {
+  if (!currentEvent.value) return
+  eventCurrentIndex.value = (eventCurrentIndex.value + 1) % currentEvent.value.images.length
+}
+
+const eventPrevImage = () => {
+  if (!currentEvent.value) return
+  eventCurrentIndex.value =
+      (eventCurrentIndex.value - 1 + currentEvent.value.images.length) %
+      currentEvent.value.images.length
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* === BLOG POSTS DYNAMISCH LADEN === */
 interface BlogPost {
   title: string;
@@ -384,14 +536,14 @@ const showTitle = ref(false);
 */
 
 // Laad JSON posts
-const blogFolders = import.meta.glob("@/mobile/assets/blog/*/post.json", {
+const blogFolders = import.meta.glob("@/desktop/assets/blog/*/post.json", {
   eager: true,
   import: "default",
 });
 
 // Laad alle blogafbeeldingen (inclusief main.jpg / main.png)
 const blogImages = import.meta.glob(
-    "@/mobile/assets/blog/**/*.{jpg,jpeg,png,webp,JPG}",
+    "@/desktop/assets/blog/**/*.{jpg,jpeg,png,webp,JPG}",
     { eager: true }
 );
 
@@ -498,13 +650,13 @@ const closePrivacyPopup = () => (showPrivacyPopup.value = false);
 
 /* === GALLERY === */
 const gemModules = import.meta.glob(
-    "@/mobile/assets/img/gems/*.{png,jpg,jpeg,webp,JPG}",
+    "@/desktop/assets/img/gems/*.{png,jpg,jpeg,webp,JPG}",
     { eager: true }
 );
 const gemImages = Object.values(gemModules).map((m: any) => m.default);
 
 const closeupModules = import.meta.glob(
-    "@/mobile/assets/img/closeup/*.{png,jpg,jpeg,webp,JPG}",
+    "@/desktop/assets/img/closeup/*.{png,jpg,jpeg,webp,JPG}",
     { eager: true }
 );
 const closeupImages = Object.values(closeupModules).map((m: any) => m.default);
@@ -513,7 +665,7 @@ const galleryItems = ref([
   { foto: gemImages[0], title: "GEMISTRY GEMS", popup: "gem" },
   { foto: closeupImages[0], title: "CLOSE-UP VIEW", popup: "closeup" },
   {
-    foto: new URL("@/mobile/assets/img/random_image/IMG_4072.jpg", import.meta.url).href,
+    foto: new URL("@/desktop/assets/img/random_image/IMG_4118.jpg", import.meta.url).href,
     title: "EVENTS",
     popup: "events",
   },
@@ -534,11 +686,7 @@ const handleCardClick = (item: any) => {
       images: closeupImages,
     });
   else
-    openBlogPopup({
-      title: item.title,
-      text: "Coming soon...",
-      images: [],
-    });
+    openEventsPopup()
 };
 
 /* === INIT ANIMATIES === */
@@ -1051,6 +1199,183 @@ footer {
     font-size: 14px;
     line-height: 1.6;
   }
+}
+
+
+/* === EVENT MAIN FOTO === */
+.events-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px auto 100px auto; /* extra ruimte voor carousel */
+  width: 100%;
+}
+.event-main-img {
+  width: 92%;
+  max-width: 700px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+/* === FIXED CARROUSEL === */
+.events-carousel-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #f2efe8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 10px;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+  z-index: 10000;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  max-width: 80%;
+}
+
+.carousel-thumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  object-fit: cover;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: 0.3s;
+}
+.carousel-thumb.selected,
+.carousel-thumb:hover {
+  opacity: 1;
+  outline: 2px solid #651a1a;
+}
+
+.carousel-btn {
+  background: #651a1a;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+
+
+/* === CUSTOM EVENT DROPDOWN === */
+.events-dropdown {
+  display: flex;
+  justify-content: center;
+  margin: 20px auto 10px auto;
+}
+
+.event-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: #fdfbf7;
+  color: #651a1a;
+  border: 2px solid #651a1a;
+  border-radius: 12px;
+  padding: 10px 40px 10px 16px;
+  font-size: 16px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-image: url("data:image/svg+xml,%3Csvg fill='%23651a1a' height='24' viewBox='0 0 24 24' width='24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 22px;
+}
+
+.event-select:hover {
+  background-color: #fff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.event-select:focus {
+  outline: none;
+  border-color: #a42c2c;
+  box-shadow: 0 0 0 3px rgba(164, 44, 44, 0.2);
+}
+
+.event-select option {
+  background: #fff;
+  color: #651a1a;
+  font-family: "Poppins", sans-serif;
+}
+
+.event-select option.past {
+  color: #aaa;
+}
+
+
+/* === FIX Z-INDEX LAYERS === */
+#event-popup .popup-header {
+  position: relative;
+  z-index: 30;
+}
+
+#event-popup .events-dropdown {
+  position: relative;
+  z-index: 30;
+}
+
+#event-popup .events-main {
+  position: relative;
+  z-index: 10;
+}
+
+#event-popup .events-carousel-fixed {
+  z-index: 5; /* lager dan dropdown */
+}
+
+
+/* 🧩 FIX: dropdown klikbaar houden boven de foto */
+#event-popup select,
+#event-popup option,
+#event-popup .events-dropdown {
+  position: relative;
+  z-index: 999999 !important;
+  pointer-events: auto !important;
+}
+
+#event-popup .events-main,
+#event-popup .event-main-img {
+  pointer-events: none; /* foto blokkeert niks meer */
+}
+
+
+
+
+/* 🧱 Fix dat lange foto's niet over de carousel vallen */
+#event-popup .gem-modal-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  padding-bottom: 130px; /* ruimte vrijhouden boven fixed carousel */
+  box-sizing: border-box;
+}
+
+/* Foto zelf netjes begrenzen */
+#event-popup .events-main {
+  max-height: calc(100vh - 220px); /* zorgt dat carousel zichtbaar blijft */
+  overflow: hidden;
+}
+
+#event-popup .event-main-img {
+  max-height: calc(100vh - 240px);
+  object-fit: contain; /* voorkomt cropping */
 }
 
 
