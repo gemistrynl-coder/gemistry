@@ -665,8 +665,8 @@ const galleryItems = ref([
   { foto: gemImages[0], title: "GEMISTRY GEMS", popup: "gem" },
   { foto: closeupImages[0], title: "CLOSE-UP VIEW", popup: "closeup" },
   {
-    foto: new URL("@/desktop/assets/img/random_image/IMG_4118.jpg", import.meta.url).href,
-    title: "EVENTS",
+    foto: new URL("@/desktop/assets/img/random_image/IMG_4111.jpg", import.meta.url).href,
+    title: "EVENTS", 
     popup: "events",
   },
 ]);

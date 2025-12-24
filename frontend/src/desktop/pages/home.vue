@@ -651,7 +651,7 @@ const galleryItems = ref([
     popup: "closeup",
   },
   {
-    foto: new URL('@/desktop/assets/img/random_image/IMG_4072.jpg', import.meta.url).href,
+    foto: new URL('@/desktop/assets/img/random_image/IMG_4111.JPG', import.meta.url).href,
     title: "EVENTS",
     popup: "events",
   },
@@ -884,7 +884,6 @@ watch([showVoorwaardenPopup, showPrivacyPopup], (states) => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   width: 380px;
-  height: 440px;
   display: flex;
   flex-direction: column;
   transition: 0.3s;
@@ -892,20 +891,22 @@ watch([showVoorwaardenPopup, showPrivacyPopup], (states) => {
 
 .gallery-card img {
   width: 100%;
-  height: 500px;
+  aspect-ratio: 4 / 5;   /* kies wat jij mooi vindt */
+  height: auto;
   object-fit: cover;
-  transition: 0.3s;
+  display: block;
 }
 
 .gallery-card h3 {
-  margin: 10px 12px 5px;
+  margin: 0;
+  padding: 12px 12px 10px;
   font-size: 26px;
   font-weight: bold;
   text-align: center;
   color: #651a1a;
-  border: 1px rgba(101, 26, 26, 0.04) solid;
-  border-radius: 2px;
+  border-top: 1px rgba(101, 26, 26, 0.04) solid;
 }
+
 
 .gallery-card:hover {
   transform: scale(1.1);
